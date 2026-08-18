@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = ["crates/typevn-core", "crates/ibus-typevn"]
+
+[workspace.package]
+version = "0.1.6"
+edition = "2021"
+license = "LicenseRef-TypeVN"
+license-file = "LICENSE"
+authors = ["vithanhlam"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[profile.bench]
+lto = true
+codegen-units = 1
+opt-level = 3

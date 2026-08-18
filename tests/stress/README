@@ -1,0 +1,4 @@
+Stress tests live in crates/typevn-core/tests/stress.rs
+
+  cargo test -p typevn-core --test stress --release
+  cargo bench -p typevn-core

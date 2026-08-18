@@ -1,0 +1,17 @@
+[package]
+name = "typevn-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "High-performance Vietnamese Telex engine (no IBus/GUI)"
+
+[lib]
+name = "typevn_core"
+crate-type = ["rlib", "staticlib"]
+
+[dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "keypress"
+harness = false

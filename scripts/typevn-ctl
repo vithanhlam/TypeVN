@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Apply a TypeVN command then poke the running IBus engine (SIGUSR1)."""
+
+import os
+import fcntl
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "typevn"
+CONFIG_PATH = CONFIG_DIR / "config"
+LOCK_PATH = CONFIG_DIR / "control.lock"
+LAST_HOTKEY_PATH = CONFIG_DIR / "last-hotkey"
+
+DEFAULTS = {
+    "method": "telex",
+    "charset": "unicode",
+    "auto_repair": "true",
+    "auto_start": "true",
+    "english": "false",
+    "hotkey_vn": "<Shift>space",
+    "hotkey_telex": "<Control><Shift>exclam",
+    "hotkey_vni": "<Control><Shift>at",
+    "hotkeys_enabled": "true",
+}
+
+
+def load_config():
+    data = dict(DEFAULTS)
+    if CONFIG_PATH.is_file():
+        for line in CONFIG_PATH.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            data[k.strip()] = v.strip()
+    return data
+
+
+def save_config(data):
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    keys = [
+        "method",
+        "charset",
+        "auto_repair",
+        "auto_start",
+        "english",
+        "hotkey_vn",
+        "hotkey_telex",
+        "hotkey_vni",
+        "hotkeys_enabled",
+    ]
+    lines = [f"{k}={data.get(k, DEFAULTS.get(k, ''))}" for k in keys]
+    tmp = CONFIG_PATH.with_suffix(".tmp")
+    tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    os.replace(tmp, CONFIG_PATH)
+
+
+def is_duplicate_hotkey(cmd):
+    """Ignore the duplicate launch GNOME can emit for one physical press."""
+    now = time.monotonic()
+    try:
+        old_cmd, old_time = LAST_HOTKEY_PATH.read_text(encoding="utf-8").split()
+        duplicate = old_cmd == cmd and 0 <= now - float(old_time) < 0.25
+    except (OSError, ValueError):
+        duplicate = False
+    LAST_HOTKEY_PATH.write_text(f"{cmd} {now}\n", encoding="utf-8")
+    return duplicate
+
+
+def notify_engine():
+    r = subprocess.run(["pkill", "-USR1", "-x", "ibus-typevn"], check=False)
+    if r.returncode != 0:
+        subprocess.run(["ibus", "engine", "typevn"], check=False, capture_output=True)
+
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
+    valid = {
+        "toggle-vn", "toggle", "viet", "vn", "anh", "en", "english",
+        "telex", "vni", "reload",
+    }
+    if cmd not in valid:
+        print("usage: typevn-ctl toggle-vn|viet|anh|telex|vni|reload", file=sys.stderr)
+        return 2
+
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    with LOCK_PATH.open("w", encoding="utf-8") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if cmd != "reload" and is_duplicate_hotkey(cmd):
+            return 0
+        # Read only after taking the lock. Concurrent shortcut processes must
+        # not all toggle from the same stale value.
+        data = load_config()
+        if cmd != "reload" and data.get("hotkeys_enabled", "true") in ("0", "false", "off"):
+            return 0
+        if cmd in ("toggle-vn", "toggle"):
+            on = data.get("english") in ("1", "true", "on")
+            data["english"] = "false" if on else "true"
+        elif cmd in ("viet", "vn"):
+            data["english"] = "false"
+        elif cmd in ("anh", "en", "english"):
+            data["english"] = "true"
+        elif cmd == "telex":
+            data["method"] = "telex"
+            data["english"] = "false"
+        elif cmd == "vni":
+            data["method"] = "vni"
+            data["english"] = "false"
+        if cmd != "reload":
+            save_config(data)
+    notify_engine()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

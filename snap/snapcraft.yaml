@@ -1,0 +1,24 @@
+name: typevn
+base: core24
+version: "0.1.0"
+summary: Vietnamese Telex/VNI input method (TypeVN)
+description: |
+  TypeVN is a low-latency Vietnamese IME for Ubuntu GNOME/IBus.
+  After installing, run: typevn.connect-ibus
+  Then add TypeVN in Settings → Keyboard → Input Sources.
+
+grade: stable
+confinement: classic
+license: LicenseRef-TypeVN
+
+apps:
+  typevn-settings:
+    command: bin/typevn-settings
+    desktop: share/applications/typevn.desktop
+  connect-ibus:
+    command: bin/connect-ibus
+
+parts:
+  typevn:
+    plugin: dump
+    source: dist/snap-root

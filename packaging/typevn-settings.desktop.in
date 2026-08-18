@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=TypeVN
+Comment=Cài đặt bộ gõ tiếng Việt TypeVN
+Exec=@EXEC@
+Icon=preferences-desktop-keyboard
+Terminal=false
+Type=Application
+Categories=Settings;DesktopSettings;
+Keywords=vietnamese;telex;vni;ime;ibus;
+StartupNotify=true

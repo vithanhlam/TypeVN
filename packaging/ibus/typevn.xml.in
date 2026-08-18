@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component>
+    <name>org.freedesktop.IBus.TypeVN</name>
+    <description>TypeVN Vietnamese Input Method</description>
+    <exec>@EXEC@ --ibus</exec>
+    <version>0.1.6</version>
+    <author>vithanhlam</author>
+    <license>TypeVN License</license>
+    <homepage></homepage>
+    <textdomain>typevn</textdomain>
+    <engines>
+        <engine>
+            <name>typevn</name>
+            <language>vi</language>
+            <license>TypeVN License</license>
+            <author>vithanhlam</author>
+            <icon>ibus-keyboard</icon>
+            <layout>us</layout>
+            <longname>TypeVN</longname>
+            <description>Bộ gõ tiếng Việt TypeVN (Telex/VNI)</description>
+            <rank>99</rank>
+            <symbol>VN</symbol>
+        </engine>
+    </engines>
+</component>

@@ -1,0 +1,438 @@
+#!/usr/bin/env python3
+"""TypeVN settings — GTK4/libadwaita. Does not sit on the typing hot path."""
+
+import ast
+import os
+import shutil
+import subprocess
+from pathlib import Path
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+gi.require_version("Gdk", "4.0")
+from gi.repository import Adw, Gdk, Gtk
+
+CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "typevn"
+CONFIG_PATH = CONFIG_DIR / "config"
+
+DEFAULTS = {
+    "method": "telex",
+    "charset": "unicode",
+    "auto_repair": "true",
+    "auto_start": "true",
+    "english": "false",
+    "hotkey_vn": "<Shift>space",
+    "hotkey_telex": "<Control><Shift>exclam",
+    "hotkey_vni": "<Control><Shift>at",
+    "hotkeys_enabled": "true",
+}
+
+AUTOSTART_PATH = Path.home() / ".config" / "autostart" / "typevn.desktop"
+AUTOSTART_DESKTOP = """[Desktop Entry]
+Type=Application
+Name=TypeVN
+Comment=Bật bộ gõ TypeVN sau khi đăng nhập
+Exec=sh -c "sleep 2; ibus engine typevn"
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Phase=Application
+"""
+
+GS_KEYS = "org.gnome.settings-daemon.plugins.media-keys"
+GS_ITEM = "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding"
+
+
+def load_config():
+    data = dict(DEFAULTS)
+    if CONFIG_PATH.is_file():
+        for line in CONFIG_PATH.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            data[k.strip()] = v.strip()
+    return data
+
+
+def save_config(data):
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    keys = [
+        "method",
+        "charset",
+        "auto_repair",
+        "auto_start",
+        "english",
+        "hotkey_vn",
+        "hotkey_telex",
+        "hotkey_vni",
+        "hotkeys_enabled",
+    ]
+    tmp = CONFIG_PATH.with_suffix(".tmp")
+    tmp.write_text(
+        "\n".join(f"{k}={data.get(k, DEFAULTS[k])}" for k in keys) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(tmp, CONFIG_PATH)
+
+
+def set_autostart(enabled: bool):
+    AUTOSTART_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if enabled:
+        AUTOSTART_PATH.write_text(AUTOSTART_DESKTOP, encoding="utf-8")
+    elif AUTOSTART_PATH.exists():
+        AUTOSTART_PATH.unlink()
+
+
+def ctl_bin():
+    for p in (
+        Path("/usr/bin/typevn-ctl"),
+        Path.home() / ".local" / "bin" / "typevn-ctl",
+        Path(__file__).resolve().parent / "typevn-ctl",
+    ):
+        if p.is_file():
+            return str(p)
+    found = shutil.which("typevn-ctl")
+    return found or "typevn-ctl"
+
+
+def notify_engine():
+    r = subprocess.run(["pkill", "-USR1", "-x", "ibus-typevn"], check=False)
+    if r.returncode != 0:
+        subprocess.run(["ibus", "engine", "typevn"], check=False, capture_output=True)
+
+
+def pretty_hotkey(accel: str) -> str:
+    if not accel:
+        return "Chưa gán"
+    s = accel
+    s = s.replace("<Control>", "Ctrl+").replace("<Primary>", "Ctrl+")
+    s = s.replace("<Shift>", "Shift+").replace("<Alt>", "Alt+")
+    s = s.replace("<Super>", "Super+")
+    rest = s
+    for tok in ("Ctrl+", "Shift+", "Alt+", "Super+"):
+        rest = rest.replace(tok, "")
+    names = {
+        "space": "Space",
+        "exclam": "1",
+        "at": "2",
+        "kp_end": "Num 1",
+        "kp_1": "Num 1",
+        "kp_down": "Num 2",
+        "kp_2": "Num 2",
+        "period": ".",
+        "comma": ",",
+        "grave": "`",
+    }
+    pretty_rest = names.get(rest.lower(), rest)
+    prefix = ""
+    if "Ctrl+" in s:
+        prefix += "Ctrl+"
+    if "Shift+" in s:
+        prefix += "Shift+"
+    if "Alt+" in s:
+        prefix += "Alt+"
+    if "Super+" in s:
+        prefix += "Super+"
+    return prefix + pretty_rest
+
+
+def gsettings_get(schema, key):
+    try:
+        return subprocess.check_output(["gsettings", "get", schema, key], text=True).strip()
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def gsettings_set(schema, key, value):
+    subprocess.run(["gsettings", "set", schema, key, value], check=False)
+
+
+def parse_path_list(raw: str):
+    raw = raw.strip()
+    if raw in ("", "@as []", "[]"):
+        return []
+    try:
+        return list(ast.literal_eval(raw))
+    except Exception:
+        return []
+
+
+def keypad_alias(binding: str) -> str:
+    """Return the same keypad key in the opposite NumLock state."""
+    pairs = {
+        "KP_End": "KP_1",
+        "KP_1": "KP_End",
+        "KP_Down": "KP_2",
+        "KP_2": "KP_Down",
+        "KP_Next": "KP_3",
+        "KP_3": "KP_Next",
+        "KP_Left": "KP_4",
+        "KP_4": "KP_Left",
+        "KP_Begin": "KP_5",
+        "KP_5": "KP_Begin",
+        "KP_Right": "KP_6",
+        "KP_6": "KP_Right",
+        "KP_Home": "KP_7",
+        "KP_7": "KP_Home",
+        "KP_Up": "KP_8",
+        "KP_8": "KP_Up",
+        "KP_Prior": "KP_9",
+        "KP_9": "KP_Prior",
+        "KP_Insert": "KP_0",
+        "KP_0": "KP_Insert",
+        "KP_Delete": "KP_Decimal",
+        "KP_Decimal": "KP_Delete",
+    }
+    for old, new in pairs.items():
+        if binding.endswith(old):
+            return binding[: -len(old)] + new
+    return ""
+
+
+def sync_gnome_hotkeys(data):
+    """Register global shortcuts so GNOME delivers keys TypeVN never sees."""
+    enabled = data.get("hotkeys_enabled", DEFAULTS["hotkeys_enabled"]) not in (
+        "0",
+        "false",
+        "off",
+    )
+    ctl = ctl_bin()
+    base_specs = [
+        ("typevn-vn", "TypeVN Việt/Anh", data.get("hotkey_vn", ""), f"{ctl} toggle-vn"),
+        ("typevn-telex", "TypeVN Telex", data.get("hotkey_telex", ""), f"{ctl} telex"),
+        ("typevn-vni", "TypeVN VNI", data.get("hotkey_vni", ""), f"{ctl} vni"),
+    ]
+    specs = []
+    for name, title, binding, command in base_specs:
+        specs.append((name, title, binding, command))
+        alias = keypad_alias(binding)
+        specs.append((f"{name}-numlock", f"{title} (NumLock)", alias, command))
+    paths = parse_path_list(gsettings_get(GS_KEYS, "custom-keybindings"))
+    ours = []
+    for name, title, binding, command in specs:
+        path = f"/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/{name}/"
+        ours.append(path)
+        if path not in paths:
+            paths.append(path)
+        item = f"{GS_ITEM}:{path}"
+        gsettings_set(item, "name", title)
+        gsettings_set(item, "command", command)
+        gsettings_set(item, "binding", binding if (enabled and binding) else "''")
+    gsettings_set(GS_KEYS, "custom-keybindings", repr(paths).replace('"', "'"))
+
+
+def capture_hotkey(parent: Gtk.Window, callback):
+    dialog = Adw.Window(transient_for=parent, modal=True, title="Nhấn phím tắt")
+    dialog.set_default_size(360, 140)
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+    box.set_margin_top(24)
+    box.set_margin_bottom(24)
+    box.set_margin_start(24)
+    box.set_margin_end(24)
+    lab = Gtk.Label(label="Nhấn tổ hợp phím mới\n(Esc để hủy)")
+    lab.set_justify(Gtk.Justification.CENTER)
+    box.append(lab)
+    dialog.set_content(box)
+
+    def on_key(_ctrl, keyval, _keycode, state):
+        name = Gdk.keyval_name(keyval) or ""
+        if name in (
+            "Control_L",
+            "Control_R",
+            "Shift_L",
+            "Shift_R",
+            "Alt_L",
+            "Alt_R",
+            "Meta_L",
+            "Meta_R",
+            "Super_L",
+            "Super_R",
+        ):
+            return True
+        if keyval == Gdk.KEY_Escape:
+            dialog.close()
+            return True
+        parts = []
+        if state & Gdk.ModifierType.CONTROL_MASK:
+            parts.append("<Control>")
+        if state & Gdk.ModifierType.ALT_MASK:
+            parts.append("<Alt>")
+        if state & Gdk.ModifierType.SHIFT_MASK:
+            parts.append("<Shift>")
+        if state & Gdk.ModifierType.SUPER_MASK:
+            parts.append("<Super>")
+        accel = "".join(parts) + name
+        callback(accel)
+        dialog.close()
+        return True
+
+    ctrl = Gtk.EventControllerKey()
+    ctrl.connect("key-pressed", on_key)
+    dialog.add_controller(ctrl)
+    dialog.present()
+
+
+class TypeVnPrefs(Adw.Application):
+    def __init__(self):
+        super().__init__(application_id="org.typevn.Settings")
+        self.connect("activate", self.on_activate)
+
+    def on_activate(self, _app):
+        cfg = load_config()
+        win = Adw.ApplicationWindow(application=self, title="TypeVN")
+        win.set_default_size(480, 620)
+
+        header = Adw.HeaderBar()
+        toolbar = Adw.ToolbarView()
+        toolbar.add_top_bar(header)
+
+        page = Adw.PreferencesPage(title="TypeVN")
+        page.set_description("Bộ gõ tiếng Việt · vithanhlam")
+
+        typing = Adw.PreferencesGroup(title="Kiểu gõ")
+        viet_row = Adw.SwitchRow(
+            title="Gõ tiếng Việt",
+            subtitle="Tắt = gõ Anh, không gắn dấu",
+        )
+        viet_row.set_active(cfg.get("english") not in ("1", "true", "on"))
+        typing.add(viet_row)
+
+        method = Adw.ComboRow(title="Bảng gõ", subtitle="Telex hoặc VNI")
+        method.set_model(Gtk.StringList.new(["Telex", "VNI"]))
+        method.set_selected(1 if cfg.get("method") == "vni" else 0)
+        typing.add(method)
+
+        charset_row = Adw.ComboRow(
+            title="Bảng mã",
+            subtitle="Unicode khuyến nghị trên Ubuntu",
+        )
+        charset_ids = ["unicode", "vni", "viqr", "tcvn3"]
+        charset_row.set_model(Gtk.StringList.new(["Unicode", "VNI Windows", "VIQR", "TCVN3"]))
+        try:
+            charset_row.set_selected(charset_ids.index(cfg.get("charset", "unicode")))
+        except ValueError:
+            charset_row.set_selected(0)
+        typing.add(charset_row)
+        page.add(typing)
+
+        repair = Adw.PreferencesGroup(title="Sửa dấu")
+        repair_row = Adw.SwitchRow(
+            title="Tự sửa lỗi dấu",
+            subtitle="Ví dụ suẳ → sửa, ua+w → ưa",
+        )
+        repair_row.set_active(cfg.get("auto_repair", "true") not in ("0", "false", "off"))
+        repair.add(repair_row)
+        page.add(repair)
+
+        startup = Adw.PreferencesGroup(title="Khởi động")
+        start_row = Adw.SwitchRow(
+            title="Tự bật khi đăng nhập",
+            subtitle="Chọn TypeVN sau khi khởi động máy",
+        )
+        start_on = cfg.get("auto_start", "true") not in ("0", "false", "off")
+        if AUTOSTART_PATH.is_file():
+            start_on = True
+        elif cfg.get("auto_start") in ("0", "false", "off"):
+            start_on = False
+        start_row.set_active(start_on)
+        startup.add(start_row)
+        page.add(startup)
+
+        keys = Adw.PreferencesGroup(
+            title="Phím tắt",
+            description="GNOME giữ phím hộ TypeVN (Shift+Space không tới IBus).",
+        )
+        hotkeys_row = Adw.SwitchRow(
+            title="Bật phím tắt",
+            subtitle="Tắt nếu không cần Shift+Space, Ctrl+Shift+1/2…",
+        )
+        hotkeys_row.set_active(
+            cfg.get("hotkeys_enabled", DEFAULTS["hotkeys_enabled"]) not in ("0", "false", "off")
+        )
+        keys.add(hotkeys_row)
+        hotkey_state = {
+            "hotkey_vn": cfg.get("hotkey_vn", DEFAULTS["hotkey_vn"]),
+            "hotkey_telex": cfg.get("hotkey_telex", DEFAULTS["hotkey_telex"]),
+            "hotkey_vni": cfg.get("hotkey_vni", DEFAULTS["hotkey_vni"]),
+        }
+        labels = {}
+
+        def add_hotkey_row(key, title, subtitle):
+            row = Adw.ActionRow(title=title, subtitle=subtitle)
+            lab = Gtk.Label(label=pretty_hotkey(hotkey_state[key]))
+            lab.add_css_class("dim-label")
+            btn = Gtk.Button(label="Đổi")
+            btn.add_css_class("flat")
+            row.add_suffix(lab)
+            row.add_suffix(btn)
+            row.set_activatable_widget(btn)
+            labels[key] = lab
+
+            def on_click(_b):
+                def apply(accel):
+                    hotkey_state[key] = accel
+                    lab.set_label(pretty_hotkey(accel))
+                    persist()
+
+                capture_hotkey(win, apply)
+
+            btn.connect("clicked", on_click)
+            keys.add(row)
+
+        add_hotkey_row("hotkey_vn", "Bật/tắt tiếng Việt", "Mặc định Shift+Space")
+        add_hotkey_row("hotkey_telex", "Chuyển Telex", "Mặc định Ctrl+Shift+1")
+        add_hotkey_row("hotkey_vni", "Chuyển VNI", "Mặc định Ctrl+Shift+2")
+
+        def update_hotkey_rows():
+            on = hotkeys_row.get_active()
+            for row in keys:
+                if row is hotkeys_row:
+                    continue
+                row.set_sensitive(on)
+
+        update_hotkey_rows()
+        page.add(keys)
+
+        loading = True
+
+        def persist(_w=None, *_a):
+            nonlocal loading
+            if loading:
+                return
+            data = {
+                "method": "vni" if method.get_selected() == 1 else "telex",
+                "charset": charset_ids[charset_row.get_selected()],
+                "auto_repair": "true" if repair_row.get_active() else "false",
+                "auto_start": "true" if start_row.get_active() else "false",
+                "english": "false" if viet_row.get_active() else "true",
+                "hotkey_vn": hotkey_state["hotkey_vn"],
+                "hotkey_telex": hotkey_state["hotkey_telex"],
+                "hotkey_vni": hotkey_state["hotkey_vni"],
+                "hotkeys_enabled": "true" if hotkeys_row.get_active() else "false",
+            }
+            save_config(data)
+            set_autostart(start_row.get_active())
+            sync_gnome_hotkeys(data)
+            notify_engine()
+
+        method.connect("notify::selected", persist)
+        charset_row.connect("notify::selected", persist)
+        repair_row.connect("notify::active", persist)
+        start_row.connect("notify::active", persist)
+        viet_row.connect("notify::active", persist)
+        hotkeys_row.connect("notify::active", lambda *_: (update_hotkey_rows(), persist()))
+        loading = False
+        sync_gnome_hotkeys(cfg)
+
+        clamp = Adw.Clamp(child=page, maximum_size=520)
+        toolbar.set_content(clamp)
+        win.set_content(toolbar)
+        win.present()
+
+
+if __name__ == "__main__":
+    Adw.init()
+    TypeVnPrefs().run()

@@ -1,0 +1,23 @@
+TypeVN License
+
+Copyright (c) 2026 vithanhlam. All rights reserved.
+
+Bạn có thể đọc mã nguồn, clone repo, build và chạy TypeVN cho mục đích cá nhân,
+học tập hoặc thử nghiệm trên máy của mình.
+
+CẤM — không được phép nếu chưa có sự đồng ý bằng văn bản của vithanhlam:
+
+  • Phân phối lại phần mềm hoặc bản build (kể cả miễn phí).
+  • Bán, cho thuê, sublicence, hoặc đưa TypeVN vào sản phẩm/dịch vụ thương mại.
+  • Phát hành bản fork, gói cài đặt, snap/flatpak/deb riêng dưới tên khác.
+
+ĐÓNG GÓP PHÁT TRIỂN — được khuyến khích:
+
+  • Báo lỗi (issue) và gửi pull request trên GitHub.
+  • Bằng việc gửi đóng góp, bạn đồng ý cấp cho vithanhlam quyền sử dụng,
+    sửa đổi và tích hợp đóng góp đó vào TypeVN theo giấy phép này.
+
+Phần mềm được cung cấp "nguyên trạng", không bảo hành. Tác giả không chịu
+trách nhiệm cho thiệt hại phát sinh từ việc sử dụng.
+
+Liên hệ: vithanhlamseo@gmail.com

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=TypeVN
+Comment=Bật bộ gõ TypeVN sau khi đăng nhập
+Exec=sh -c "sleep 2; ibus engine typevn"
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Phase=Application

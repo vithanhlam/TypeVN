@@ -1,0 +1,12 @@
+Source: typevn
+Section: utils
+Priority: optional
+Maintainer: vithanhlam
+Build-Depends: debhelper-compat (= 13), cargo, rustc, libibus-1.0-dev, pkg-config
+Standards-Version: 4.6.2
+
+Package: ibus-typevn
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ibus
+Description: TypeVN Vietnamese Telex IME for IBus
+ High-performance Vietnamese input method (Telex) for Ubuntu/GNOME.

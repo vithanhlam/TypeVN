@@ -1,0 +1,13 @@
+/target
+/dist
+**/*.rs.bk
+.idea
+.vscode
+*.swp
+*.deb
+BUILD.MD
+BUILD.md
+SPEC.md
+SPEC.MD
+__pycache__/
+*.pyc

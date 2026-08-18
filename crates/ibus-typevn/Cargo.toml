@@ -1,0 +1,17 @@
+[package]
+name = "ibus-typevn"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Thin IBus adapter for TypeVN (no Telex logic)"
+
+[[bin]]
+name = "ibus-typevn"
+path = "src/main.rs"
+
+[dependencies]
+typevn-core = { path = "../typevn-core" }
+
+[build-dependencies]
+cc = "1"
+pkg-config = "0.3"
