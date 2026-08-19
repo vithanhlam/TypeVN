@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/vithanhlam/TypeVN/releases/tag/v0.1.6"><img src="https://img.shields.io/badge/release-v0.1.6-0ea5e9" alt="release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-TypeVN-ef4444" alt="license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e" alt="license"></a>
   <a href="CHANGELOG.MD"><img src="https://img.shields.io/badge/changelog-0.1.6-6366f1" alt="changelog"></a>
 </p>
 
@@ -22,7 +22,7 @@ Engine xử lý phím viết bằng **Rust** (đồng bộ, không queue, không
 
 ## Cài đặt
 
-Chọn **một** trong hai cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (không phải layout XKB tên “Vietnamese”).
+Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (không phải layout XKB tên “Vietnamese”).
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
@@ -37,7 +37,16 @@ sudo apt install ./ibus-typevn_0.1.6_amd64.deb
    hoặc nhấn **Super+Space** đến khi thấy TypeVN / VN.
 4. Mở app **TypeVN** (hoặc `typevn-settings`) để chọn Telex/VNI, tự sửa dấu, tự bật lúc đăng nhập.
 
-### Cách 2 — Từ mã nguồn (dành cho đang phát triển)
+### Cách 2 — Snap (Ubuntu Software / snapcraft)
+
+```bash
+sudo snap install typevn --classic
+typevn.connect-ibus
+```
+
+Rồi thêm nguồn nhập **TypeVN** như trên. Gỡ: `sudo snap remove typevn`.
+
+### Cách 3 — Từ mã nguồn (dành cho đang phát triển)
 
 Cần `git`, `cargo` (Rust) và IBus (GNOME Ubuntu đã có sẵn).
 
@@ -52,6 +61,7 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 ### Gỡ cài đặt
 
 - Bản `.deb`: `sudo apt remove ibus-typevn`
+- Bản snap: `sudo snap remove typevn`
 - Bản `./setup.sh`: `./scripts/uninstall-dev.sh`
 
 ---
@@ -120,4 +130,4 @@ Nhật ký phiên bản: [CHANGELOG.MD](CHANGELOG.MD)
 
 ## Giấy phép & đóng góp
 
-TypeVN thuộc bản quyền **vithanhlam** — [LICENSE](LICENSE): dùng cá nhân được, **cấm** người khác phân phối lại hoặc thương mại hóa. Mọi người có thể tham gia phát triển qua [CONTRIBUTING.md](CONTRIBUTING.md) (issue, pull request).
+TypeVN thuộc bản quyền **vithanhlam**, phát hành dưới [MIT License](LICENSE). Mọi người có thể tham gia phát triển qua [CONTRIBUTING.md](CONTRIBUTING.md) (issue, pull request).

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Drop extra Co-authored-by trailers before the message is finalized.
+msg_file=$1
+sed -i '/^[Cc]o-[Aa]uthored-by:.*\(Cursor\|Claude\|ChatGPT\|cursoragent\|anthropic\)/Id' "$msg_file"

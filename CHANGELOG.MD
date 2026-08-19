@@ -2,13 +2,13 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
-## 0.1.6 — 2026-08-18
+## 0.1.6 — 2026-08-19
 
-Đổi giấy phép + làm sạch contributor graph GitHub. Gói: **`ibus-typevn_0.1.6_amd64.deb`**.
+Đổi giấy phép **MIT** (GitHub) + làm sạch lịch sử git. Gói: **`ibus-typevn_0.1.6_amd64.deb`**, snap **`typevn`**.
 
-- Giấy phép **TypeVN License**: cá nhân được, cấm phân phối/thương mại hóa bởi người khác.
+- Giấy phép [MIT](LICENSE) — bản quyền vithanhlam.
 - [CONTRIBUTING.md](CONTRIBUTING.md): hướng dẫn mọi người tham gia phát triển (issue, PR).
-- Rewrite lịch sử git — xóa mọi `Co-authored-by` AI; contributor chỉ còn vithanhlam.
+- Lịch sử git chỉ còn author **vithanhlam**.
 
 ## 0.1.5 — 2026-08-18
 
@@ -94,6 +94,6 @@ Bản đầu tiên trên Ubuntu/GNOME Wayland. Tác giả: **vithanhlam**.
 ### Chưa làm
 
 - Tray indicator.
-- Snap trên Ubuntu Software (tên `typevn` đã đăng ký; IME hiện phân phối bằng `.deb`).
+- Tray / chỉ báo trên thanh trạng thái.
 - Tùy biến phím tắt trên GUI.
 - Test tay đủ mọi app Electron/Qt.

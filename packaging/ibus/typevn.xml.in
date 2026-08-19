@@ -5,14 +5,14 @@
     <exec>@EXEC@ --ibus</exec>
     <version>0.1.6</version>
     <author>vithanhlam</author>
-    <license>TypeVN License</license>
-    <homepage></homepage>
+    <license>MIT</license>
+    <homepage>https://github.com/vithanhlam/TypeVN</homepage>
     <textdomain>typevn</textdomain>
     <engines>
         <engine>
             <name>typevn</name>
             <language>vi</language>
-            <license>TypeVN License</license>
+            <license>MIT</license>
             <author>vithanhlam</author>
             <icon>ibus-keyboard</icon>
             <layout>us</layout>

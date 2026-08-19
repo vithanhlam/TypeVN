@@ -5,8 +5,7 @@ members = ["crates/typevn-core", "crates/ibus-typevn"]
 [workspace.package]
 version = "0.1.6"
 edition = "2021"
-license = "LicenseRef-TypeVN"
-license-file = "LICENSE"
+license = "MIT"
 authors = ["vithanhlam"]
 
 [profile.release]

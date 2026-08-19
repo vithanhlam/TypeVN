@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 export PATH="${HOME}/.cargo/bin:${PATH}"
 
+"${ROOT}/scripts/setup-git-hooks.sh"
+
 BIN_SRC="${ROOT}/target/release/ibus-typevn"
 BIN_DST="${HOME}/.local/libexec/ibus-typevn"
 COMP_DIR="${HOME}/.local/share/ibus/component"
