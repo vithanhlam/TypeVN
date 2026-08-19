@@ -7,6 +7,7 @@ Mọi ngày theo giờ máy (UTC+7).
 Đổi giấy phép **MIT** (GitHub) + làm sạch lịch sử git. Gói: **`ibus-typevn_0.1.6_amd64.deb`**, snap **`typevn`**.
 
 - Giấy phép [MIT](LICENSE) — bản quyền vithanhlam.
+- Snap **typevn** đã upload lên Snap Store; chờ Canonical duyệt classic confinement.
 - [CONTRIBUTING.md](CONTRIBUTING.md): hướng dẫn mọi người tham gia phát triển (issue, PR).
 - Lịch sử git chỉ còn author **vithanhlam**.
 

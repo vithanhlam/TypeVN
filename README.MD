@@ -37,7 +37,9 @@ sudo apt install ./ibus-typevn_0.1.6_amd64.deb
    hoặc nhấn **Super+Space** đến khi thấy TypeVN / VN.
 4. Mở app **TypeVN** (hoặc `typevn-settings`) để chọn Telex/VNI, tự sửa dấu, tự bật lúc đăng nhập.
 
-### Cách 2 — Snap (Ubuntu Software / snapcraft)
+### Cách 2 — Snap (Snap Store)
+
+Snap **typevn** đã tải lên [Snap Store](https://dashboard.snapcraft.io/snaps/typevn/) (bản 0.1.6). Canonical đang duyệt **classic confinement** vì bộ gõ IBus phải gắn vào hệ thống. Khi lên kệ:
 
 ```bash
 sudo snap install typevn --classic

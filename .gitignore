@@ -5,6 +5,7 @@
 .vscode
 *.swp
 *.deb
+*.snap
 BUILD.MD
 BUILD.md
 SPEC.md
