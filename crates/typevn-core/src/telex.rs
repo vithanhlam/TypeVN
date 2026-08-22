@@ -346,38 +346,6 @@ pub(crate) fn apply_horn_or_breve(buf: &mut [char]) -> bool {
     false
 }
 
-pub(crate) fn auto_repair_marks(buf: &mut [char]) {
-    if buf.len() < 2 {
-        return;
-    }
-    let start = last_syllable_start(buf);
-    if start + 1 >= buf.len() {
-        return;
-    }
-    for i in start..buf.len() - 1 {
-        let Some(vu) = parse_vowel(buf[i]) else {
-            continue;
-        };
-        let Some(va) = parse_vowel(buf[i + 1]) else {
-            continue;
-        };
-        if vu.base == 'u' && va.base == 'a' && va.shape == Shape::Breve {
-            let mut nu = vu;
-            let mut na = va;
-            nu.shape = Shape::Horn;
-            na.shape = Shape::Plain;
-            if na.tone != Tone::None && nu.tone == Tone::None {
-                nu.tone = na.tone;
-                na.tone = Tone::None;
-            }
-            if let (Some(cu), Some(ca)) = (compose_vowel(nu), compose_vowel(na)) {
-                buf[i] = cu;
-                buf[i + 1] = ca;
-            }
-        }
-    }
-}
-
 fn vowel_indices(buf: &[char]) -> Vec<usize> {
     let skip_i = gi_onset_skip_i(buf);
     let skip_u = qu_onset_skip_u(buf);

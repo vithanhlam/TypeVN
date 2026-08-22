@@ -11,9 +11,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/vithanhlam/TypeVN/releases/tag/v0.1.6"><img src="https://img.shields.io/badge/release-v0.1.6-0ea5e9" alt="release"></a>
+  <a href="https://github.com/vithanhlam/TypeVN/releases/tag/v0.1.7"><img src="https://img.shields.io/badge/release-v0.1.7-0ea5e9" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e" alt="license"></a>
-  <a href="CHANGELOG.MD"><img src="https://img.shields.io/badge/changelog-0.1.6-6366f1" alt="changelog"></a>
+  <a href="CHANGELOG.MD"><img src="https://img.shields.io/badge/changelog-0.1.7-6366f1" alt="changelog"></a>
 </p>
 
 Engine xử lý phím viết bằng **Rust** (đồng bộ, không queue, không mạng). Gắn vào Ubuntu qua **IBus**. Cửa sổ cài đặt GTK4/libadwaita. Không Electron, không Node.js, không Python trên đường gõ.
@@ -26,11 +26,11 @@ Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (k
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
-1. Tải file: [ibus-typevn_0.1.6_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.1.6/ibus-typevn_0.1.6_amd64.deb)
+1. Tải file: [ibus-typevn_0.1.7_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.1.7/ibus-typevn_0.1.7_amd64.deb)
 2. Mở Terminal trong thư mục vừa tải, chạy:
 
 ```bash
-sudo apt install ./ibus-typevn_0.1.6_amd64.deb
+sudo apt install ./ibus-typevn_0.1.7_amd64.deb
 ```
 
 3. **Settings → Keyboard → Input Sources → Add → Vietnamese → TypeVN**  
@@ -39,7 +39,7 @@ sudo apt install ./ibus-typevn_0.1.6_amd64.deb
 
 ### Cách 2 — Snap (Snap Store)
 
-Snap **typevn** đã tải lên [Snap Store](https://dashboard.snapcraft.io/snaps/typevn/) (bản 0.1.6). Canonical đang duyệt **classic confinement** vì bộ gõ IBus phải gắn vào hệ thống. Khi lên kệ:
+Snap **typevn** đã tải lên [Snap Store](https://dashboard.snapcraft.io/snaps/typevn/) (bản 0.1.7). Canonical đang duyệt **classic confinement** vì bộ gõ IBus phải gắn vào hệ thống. Khi lên kệ:
 
 ```bash
 sudo snap install typevn --classic
@@ -84,6 +84,10 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 
 Ví dụ: `tieengs` → **tiếng** · `Vieetj` → **Việt** · `cuar` → **của** · `giups` → **giúp** · `dduwowcj` → **được**
 
+Macro sửa lỗi exact-match như `Loix` → **Lỗi** được lưu trong
+[`data/macros.json`](data/macros.json). Macro cá nhân có thể thêm tại
+`~/.config/typevn/macros.json`.
+
 ### VNI
 
 `1–5` dấu · `6` â/ê/ô · `7` ă/ơ · `8` ư · `9` đ · `0` bỏ dấu  
@@ -105,7 +109,7 @@ Trên Ubuntu GNOME (Wayland), `Ctrl+Shift` và `Ctrl+Alt+T` thường **không t
 
 Khi bấm đúng, gõ hiện dòng **TypeVN · Telex** (hoặc VNI / Việt / Anh). Trong app **TypeVN** có công tắc **Bật phím tắt** (tắt hẳn nếu không cần), công tắc gõ tiếng Việt, đổi Telex/VNI, và nút **Đổi** để gán phím tắt (GNOME nhận phím dù IBus không thấy Shift+Space).
 
-Cấu hình lưu tại `~/.config/typevn/config` (engine chỉ đọc lúc khởi động, không đọc file mỗi phím).
+Cấu hình lưu tại `~/.config/typevn/config` (engine chỉ đọc lúc khởi động, không đọc file mỗi phím). Macro cá nhân lưu tại `~/.config/typevn/macros.json` và được đọc một lần khi engine khởi động.
 
 ---
 

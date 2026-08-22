@@ -1,8 +1,9 @@
 use crate::charset::Charset;
 use crate::english::is_tech_prefix;
 use crate::key::{KeyEvent, KEY};
+use crate::repair::{repair_basic_errors, MacroStore};
 use crate::syllable::last_syllable_start;
-use crate::telex::{apply_telex, auto_repair_marks, pop_char};
+use crate::telex::{apply_telex, pop_char};
 use crate::vni::apply_vni;
 use crate::MAX_COMPOSE_CHARS;
 
@@ -53,6 +54,7 @@ pub struct VietnameseEngine {
     charset: Charset,
     auto_repair: bool,
     hotkeys_enabled: bool,
+    macros: MacroStore,
 }
 
 impl Default for VietnameseEngine {
@@ -83,6 +85,7 @@ impl VietnameseEngine {
             charset: cfg.charset,
             auto_repair: cfg.auto_repair,
             hotkeys_enabled: cfg.hotkeys_enabled,
+            macros: MacroStore::load(),
         }
     }
 
@@ -188,6 +191,11 @@ impl VietnameseEngine {
 
     fn take_buffer(&mut self) -> String {
         let raw: String = self.buffer.iter().collect();
+        let raw = if self.auto_repair {
+            self.macros.replace(&self.raw_buffer, raw)
+        } else {
+            raw
+        };
         self.clear_buffer();
         self.charset.encode(&raw)
     }
@@ -337,7 +345,7 @@ impl VietnameseEngine {
                     }
                 }
                 if self.auto_repair && !self.literal_token {
-                    auto_repair_marks(&mut self.buffer);
+                    repair_basic_errors(&mut self.buffer);
                 }
                 self.cursor = self.buffer.len();
                 return EngineAction::Preedit(self.buffer_str());

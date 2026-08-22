@@ -174,7 +174,7 @@ checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
 
 [[package]]
 name = "ibus-typevn"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "cc",
  "pkg-config",
@@ -385,9 +385,10 @@ dependencies = [
 
 [[package]]
 name = "typevn-core"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "criterion",
+ "serde_json",
 ]
 
 [[package]]

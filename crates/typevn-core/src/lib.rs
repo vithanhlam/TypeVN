@@ -8,6 +8,7 @@ mod config;
 mod engine;
 mod english;
 mod key;
+mod repair;
 mod syllable;
 mod telex;
 mod vni;

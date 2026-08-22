@@ -1,5 +1,5 @@
 //! Small prefix table for technical/English passthrough.
-//! Intentionally tiny — not a dictionary. Prefixes shorter than 3 are ignored
+//! Intentionally tiny — not a dictionary. Prefixes shorter than 4 are ignored
 //! so common Telex (`as` → `á`) still works.
 
 const TECH: &[&str] = &[
@@ -86,7 +86,10 @@ fn ascii_lower_buf(chars: &[char], extra: Option<char>, out: &mut [u8]) -> usize
 pub fn is_tech_prefix(chars: &[char], extra: Option<char>) -> bool {
     let mut tmp = [0u8; 32];
     let n = ascii_lower_buf(chars, extra, &mut tmp);
-    if n < 3 {
+    // Three-letter prefixes are too ambiguous in Vietnamese. In particular,
+    // `tru` is a prefix of English `true`, but is also the very common
+    // Vietnamese onset+nucleus in `trưa`, `trước`, `trường`, ... .
+    if n < 4 {
         return false;
     }
     let prefix = match std::str::from_utf8(&tmp[..n]) {

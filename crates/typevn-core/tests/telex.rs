@@ -113,6 +113,32 @@ fn words() {
 }
 
 #[test]
+fn reported_words() {
+    assert_eq!(telex("Truwa"), "Trưa");
+    assert_eq!(telex("Truowng"), "Trương");
+}
+
+#[test]
+fn community_macros_apply_at_word_boundary() {
+    assert_eq!(telex("Loix "), "Lỗi ");
+    assert_eq!(telex("loix "), "lỗi ");
+}
+
+#[test]
+fn disabling_auto_repair_disables_macros() {
+    let mut eng = engine();
+    eng.set_auto_repair(false);
+    assert_eq!(feed(&mut eng, "Loix "), "Lõi ");
+}
+
+#[test]
+fn short_technical_prefixes_do_not_block_vietnamese_telex() {
+    assert_eq!(telex("true"), "true");
+    assert_eq!(telex("console"), "console");
+    assert_eq!(telex("Truowsc"), "Trước");
+}
+
+#[test]
 fn space_commits() {
     let mut eng = engine();
     let a = eng.process_key(KeyEvent::from_char('a'));

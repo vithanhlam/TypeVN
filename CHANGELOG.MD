@@ -2,6 +2,16 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.1.7 — 2026-08-22
+
+Tách dữ liệu sửa lỗi khỏi code để cộng đồng có thể đóng góp dễ hơn.
+
+- Thêm `data/macros.json` cho các macro sửa lỗi exact-match, ví dụ `Loix` → `Lỗi`.
+- Hỗ trợ macro cá nhân tại `~/.config/typevn/macros.json`; macro cá nhân được ưu tiên.
+- Thêm `src/repair.rs` làm nơi tập trung các sửa lỗi Telex cơ bản.
+- Sửa lỗi tiền tố `tru` bị nhận nhầm là `true`, khiến `Truwa` và `Truowng` không hoạt động.
+- Bổ sung test hồi quy và hướng dẫn đóng góp macro trong `CONTRIBUTING.md`.
+
 ## 0.1.6 — 2026-08-19
 
 Đổi giấy phép **MIT** (GitHub) + làm sạch lịch sử git. Gói: **`ibus-typevn_0.1.6_amd64.deb`**, snap **`typevn`**.
