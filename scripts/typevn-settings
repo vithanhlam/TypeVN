@@ -2,9 +2,13 @@
 """TypeVN settings — GTK4/libadwaita. Does not sit on the typing hot path."""
 
 import ast
+import json
 import os
+import re
 import shutil
 import subprocess
+import threading
+import urllib.request
 from pathlib import Path
 
 import gi
@@ -12,7 +16,11 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("Gdk", "4.0")
-from gi.repository import Adw, Gdk, Gtk
+from gi.repository import Adw, Gdk, GLib, Gtk
+
+APP_VERSION = "0.1.8"
+GITHUB_URL = "https://github.com/vithanhlam/TypeVN"
+GITHUB_RELEASES_API = "https://api.github.com/repos/vithanhlam/TypeVN/releases/latest"
 
 CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "typevn"
 CONFIG_PATH = CONFIG_DIR / "config"
@@ -190,6 +198,52 @@ def keypad_alias(binding: str) -> str:
         if binding.endswith(old):
             return binding[: -len(old)] + new
     return ""
+
+
+def version_tuple(value: str):
+    match = re.fullmatch(r"v?(\d+)\.(\d+)\.(\d+)", value.strip())
+    return tuple(int(part) for part in match.groups()) if match else None
+
+
+def check_latest_release(row: Adw.ActionRow, link: Gtk.LinkButton):
+    """Check GitHub without blocking GTK's main loop."""
+
+    def worker():
+        try:
+            request = urllib.request.Request(
+                GITHUB_RELEASES_API,
+                headers={"Accept": "application/vnd.github+json", "User-Agent": "TypeVN"},
+            )
+            with urllib.request.urlopen(request, timeout=4) as response:
+                release = json.load(response)
+            latest = release.get("tag_name", "")
+            latest_tuple = version_tuple(latest)
+            current_tuple = version_tuple(APP_VERSION)
+            release_url = release.get("html_url", GITHUB_URL)
+            if latest_tuple and current_tuple and latest_tuple > current_tuple:
+                message = f"Có bản mới {latest}. Nhấn GitHub để tải xuống."
+                title = f"Có bản cập nhật mới · {latest}"
+            elif latest_tuple and current_tuple:
+                message = "Bạn đang dùng bản mới nhất."
+                title = f"TypeVN · v{APP_VERSION}"
+            else:
+                message = "Không đọc được số version của bản phát hành mới."
+                title = f"TypeVN · v{APP_VERSION}"
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            release_url = GITHUB_URL
+            title = f"TypeVN · v{APP_VERSION}"
+            message = "Không thể kiểm tra cập nhật lúc này."
+            print(f"typevn: update check failed: {error}")
+
+        def update_ui():
+            row.set_title(title)
+            row.set_subtitle(message)
+            link.set_uri(release_url)
+            return GLib.SOURCE_REMOVE
+
+        GLib.idle_add(update_ui)
+
+    threading.Thread(target=worker, daemon=True).start()
 
 
 def sync_gnome_hotkeys(data):
@@ -397,6 +451,23 @@ class TypeVnPrefs(Adw.Application):
         page.add(keys)
 
         loading = True
+
+        about = Adw.PreferencesGroup(title="TypeVN")
+        release_row = Adw.ActionRow(
+            title=f"TypeVN · v{APP_VERSION}",
+            subtitle="Đang kiểm tra bản cập nhật…",
+        )
+        github_link = Gtk.LinkButton.new_with_label(GITHUB_URL, "GitHub")
+        release_row.add_suffix(github_link)
+        about.add(release_row)
+
+        thanks_row = Adw.ActionRow(
+            title="Cảm ơn cộng đồng TypeVN",
+            subtitle="Cảm ơn các bạn đã báo lỗi, thêm macro, viết code và phát triển TypeVN.",
+        )
+        about.add(thanks_row)
+        page.add(about)
+        check_latest_release(release_row, github_link)
 
         def persist(_w=None, *_a):
             nonlocal loading

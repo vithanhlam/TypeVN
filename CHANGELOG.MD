@@ -2,6 +2,15 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.1.8 — 2026-08-22
+
+Cải thiện ứng dụng cài đặt và kết nối cộng đồng.
+
+- Hiển thị version hiện tại trong cửa sổ TypeVN Settings.
+- Thêm link GitHub và lời cảm ơn những người đóng góp, phát triển TypeVN.
+- Kiểm tra bản release mới trên GitHub ở background, không chặn giao diện.
+- Hiển thị nút cập nhật khi GitHub có version mới hơn.
+
 ## 0.1.7 — 2026-08-22
 
 Tách dữ liệu sửa lỗi khỏi code để cộng đồng có thể đóng góp dễ hơn.
