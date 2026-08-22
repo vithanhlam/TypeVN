@@ -11,6 +11,7 @@ Tách dữ liệu sửa lỗi khỏi code để cộng đồng có thể đóng 
 - Thêm `src/repair.rs` làm nơi tập trung các sửa lỗi Telex cơ bản.
 - Sửa lỗi tiền tố `tru` bị nhận nhầm là `true`, khiến `Truwa` và `Truowng` không hoạt động.
 - Bổ sung test hồi quy và hướng dẫn đóng góp macro trong `CONTRIBUTING.md`.
+- Giữ nguyên thông tin author và `Co-authored-by` để mọi contributor được ghi nhận.
 
 ## 0.1.6 — 2026-08-19
 

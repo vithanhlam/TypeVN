@@ -4,7 +4,7 @@ Cảm ơn bạn quan tâm TypeVN. Mọi người đều có thể tham gia phát
 
 ## Cách tham gia
 
-Sau khi clone, bật git hook (giữ author commit là người dùng git local):
+Sau khi clone, bật các git hook tùy chọn của repo:
 
 ```bash
 ./scripts/setup-git-hooks.sh
@@ -46,10 +46,13 @@ Người dùng cũng có thể thêm macro cá nhân tại:
 
 Macro cá nhân có cùng định dạng và được ưu tiên hơn danh sách mặc định.
 
-## Giấy phép đóng góp
+## Giấy phép và ghi nhận đóng góp
 
 Bằng việc gửi PR, bạn đồng ý cấp đóng góp dưới [MIT License](LICENSE).
-Commit trên repo chính chỉ ghi author **vithanhlam**.
+Tên GitHub của bạn sẽ được hiển thị trên PR và trong lịch sử đóng góp. Khi
+commit hoặc merge, không đổi author về **vithanhlam** và không xóa
+`Co-authored-by` của những người cùng đóng góp. Nếu dùng squash merge, hãy
+giữ contributor của PR trong thông tin commit để mọi người đều được ghi nhận.
 
 ## Phạm vi phù hợp
 
