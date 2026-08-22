@@ -1,6 +1,6 @@
 name: typevn
 base: core24
-version: "0.1.9"
+version: "0.1.10"
 summary: Vietnamese Telex/VNI input method (TypeVN)
 description: |
   TypeVN is a low-latency Vietnamese IME for Ubuntu GNOME/IBus.

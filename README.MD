@@ -40,11 +40,11 @@ Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (k
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
-1. Tải file: [ibus-typevn_0.1.9_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.1.9/ibus-typevn_0.1.9_amd64.deb)
+1. Tải file: [ibus-typevn_0.1.10_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.1.10/ibus-typevn_0.1.10_amd64.deb)
 2. Mở Terminal trong thư mục vừa tải, chạy:
 
 ```bash
-sudo apt install ./ibus-typevn_0.1.9_amd64.deb
+sudo apt install ./ibus-typevn_0.1.10_amd64.deb
 ```
 
 3. **Settings → Keyboard → Input Sources → Add → Vietnamese → TypeVN**  
@@ -53,7 +53,7 @@ sudo apt install ./ibus-typevn_0.1.9_amd64.deb
 
 ### Cách 2 — Snap (Snap Store)
 
-Snap **typevn** đã tải lên [Snap Store](https://dashboard.snapcraft.io/snaps/typevn/) (bản 0.1.9). Canonical đang duyệt **classic confinement** vì bộ gõ IBus phải gắn vào hệ thống. Khi lên kệ:
+Snap **typevn** đã tải lên [Snap Store](https://dashboard.snapcraft.io/snaps/typevn/) (bản 0.1.10). Canonical đang duyệt **classic confinement** vì bộ gõ IBus phải gắn vào hệ thống. Khi lên kệ:
 
 ```bash
 sudo snap install typevn --classic

@@ -2,6 +2,11 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.1.10 — 2026-08-22
+
+- Đổi mô tả dưới tiêu đề thành `Bộ gõ tiếng Việt`.
+- Hiển thị tác giả **Vi Văn Lâm** cùng link GitHub và lời cảm ơn cộng đồng.
+
 ## 0.1.9 — 2026-08-22
 
 - Đổi mô tả đầu cửa sổ Settings thành `Bộ gõ tiếng Việt TypeVN`, bỏ tên author khỏi giao diện chính.

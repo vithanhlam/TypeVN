@@ -18,7 +18,7 @@ gi.require_version("Adw", "1")
 gi.require_version("Gdk", "4.0")
 from gi.repository import Adw, Gdk, GLib, Gtk
 
-APP_VERSION = "0.1.9"
+APP_VERSION = "0.1.10"
 GITHUB_URL = "https://github.com/vithanhlam/TypeVN"
 GITHUB_RELEASES_API = "https://api.github.com/repos/vithanhlam/TypeVN/releases/latest"
 
@@ -344,7 +344,7 @@ class TypeVnPrefs(Adw.Application):
         toolbar.add_top_bar(header)
 
         page = Adw.PreferencesPage(title="TypeVN")
-        page.set_description("Bộ gõ tiếng Việt TypeVN")
+        page.set_description("Bộ gõ tiếng Việt")
 
         typing = Adw.PreferencesGroup(title="Kiểu gõ")
         viet_row = Adw.SwitchRow(
@@ -460,6 +460,12 @@ class TypeVnPrefs(Adw.Application):
         github_link = Gtk.LinkButton.new_with_label(GITHUB_URL, "GitHub")
         release_row.add_suffix(github_link)
         about.add(release_row)
+
+        author_row = Adw.ActionRow(
+            title="Tác giả",
+            subtitle="Vi Văn Lâm",
+        )
+        about.add(author_row)
 
         thanks_row = Adw.ActionRow(
             title="Cảm ơn cộng đồng TypeVN",
