@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 export PATH="${HOME}/.cargo/bin:${PATH}"
-VER="${TYPEVN_VERSION:-0.1.8}"
+VER="${TYPEVN_VERSION:-0.1.9}"
 ARCH="$(dpkg --print-architecture)"
 PKG="ibus-typevn_${VER}_${ARCH}"
 DIST="${ROOT}/dist"

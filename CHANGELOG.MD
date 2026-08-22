@@ -2,6 +2,10 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.1.9 — 2026-08-22
+
+- Đổi mô tả đầu cửa sổ Settings thành `Bộ gõ tiếng Việt TypeVN`, bỏ tên author khỏi giao diện chính.
+
 ## 0.1.8 — 2026-08-22
 
 Cải thiện ứng dụng cài đặt và kết nối cộng đồng.
