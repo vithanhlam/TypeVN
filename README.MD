@@ -5,18 +5,32 @@
 <h1 align="center">TypeVN</h1>
 
 <p align="center">
-  Bộ gõ tiếng Việt cho Ubuntu / GNOME (Wayland)<br>
-  Telex · VNI · IBus · Rust<br>
-  <strong>vithanhlam</strong>
+  Bộ gõ tiếng Việt nhanh, nhẹ cho Ubuntu / GNOME Wayland<br>
+  Telex · VNI · Unicode · IBus · Rust
 </p>
 
 <p align="center">
-  <a href="https://github.com/vithanhlam/TypeVN/releases/tag/v0.1.7"><img src="https://img.shields.io/badge/release-v0.1.7-0ea5e9" alt="release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e" alt="license"></a>
-  <a href="CHANGELOG.MD"><img src="https://img.shields.io/badge/changelog-0.1.7-6366f1" alt="changelog"></a>
+  <a href="https://github.com/vithanhlam/TypeVN/releases/latest"><img src="https://img.shields.io/github/v/release/vithanhlam/TypeVN?style=flat-square&color=0ea5e9" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square" alt="MIT License"></a>
+  <a href="https://github.com/vithanhlam/TypeVN/graphs/contributors"><img src="https://img.shields.io/github/contributors/vithanhlam/TypeVN?style=flat-square" alt="Contributors"></a>
 </p>
 
 Engine xử lý phím viết bằng **Rust** (đồng bộ, không queue, không mạng). Gắn vào Ubuntu qua **IBus**. Cửa sổ cài đặt GTK4/libadwaita. Không Electron, không Node.js, không Python trên đường gõ.
+
+### Điểm nổi bật
+
+- Telex và VNI, Unicode, VNI Windows, VIQR và TCVN3.
+- Tự đặt dấu tiếng Việt, tự sửa trạng thái Telex và macro sửa lỗi bằng JSON.
+- Giữ nguyên tiếng Anh, username, mã sản phẩm và chuỗi kỹ thuật không hợp lệ.
+- Backspace hoàn tác theo từng phím; buffer dài không bị cắt.
+- Tối ưu cho Ubuntu GNOME / Wayland, mục tiêu dưới 1 ms mỗi keypress.
+
+<p align="center">
+  <a href="#cài-đặt">Cài đặt</a> ·
+  <a href="#cách-gõ">Cách gõ</a> ·
+  <a href="#macro-sửa-lỗi">Macro</a> ·
+  <a href="#đóng-góp">Đóng góp</a>
+</p>
 
 ---
 
@@ -68,7 +82,7 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 
 ---
 
-## Dùng hàng ngày
+## Cách gõ
 
 1. Chọn nguồn nhập **TypeVN** (Super+Space).
 2. Gõ Telex hoặc VNI như bảng dưới.
@@ -84,7 +98,9 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 
 Ví dụ: `tieengs` → **tiếng** · `Vieetj` → **Việt** · `cuar` → **của** · `giups` → **giúp** · `dduwowcj` → **được**
 
-Macro sửa lỗi exact-match như `Loix` → **Lỗi** được lưu trong
+### Macro sửa lỗi
+
+Macro exact-match như `Loix` → **Lỗi** được lưu trong
 [`data/macros.json`](data/macros.json). Macro cá nhân có thể thêm tại
 `~/.config/typevn/macros.json`.
 
@@ -113,6 +129,35 @@ Cấu hình lưu tại `~/.config/typevn/config` (engine chỉ đọc lúc khở
 
 ---
 
+## Người đóng góp
+
+Cảm ơn tất cả mọi người đã báo lỗi, đề xuất, viết code, thêm macro và cải thiện
+tài liệu. Contributor được ghi nhận công khai trên GitHub và hiển thị bên dưới:
+
+<p align="center">
+  <a href="https://github.com/vithanhlam/TypeVN/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=vithanhlam/TypeVN" alt="Danh sách người đóng góp TypeVN">
+  </a>
+</p>
+
+Xem toàn bộ lịch sử tại [GitHub Contributors](https://github.com/vithanhlam/TypeVN/graphs/contributors).
+
+## Đóng góp
+
+TypeVN chào đón mọi đóng góp: sửa luật gõ, thêm macro, test, tài liệu, bản dịch,
+giao diện và báo lỗi trên nhiều ứng dụng Linux.
+
+Nếu chỉ thêm macro, không cần sửa Rust:
+
+1. Mở [`data/macros.json`](data/macros.json).
+2. Thêm cặp `chuỗi-gõ`: `kết-quả` chính xác.
+3. Thêm test nếu cần và chạy `cargo test -p typevn-core`.
+4. Gửi pull request ngắn gọn, mô tả thay đổi.
+
+Không thêm thay thế mơ hồ như `toi` → `tôi`, vì có thể làm hỏng tên riêng,
+tiếng Anh hoặc username. Xem hướng dẫn chi tiết trong
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Kiến trúc
 
 ```text
@@ -134,6 +179,7 @@ cargo bench -p typevn-core
 
 Nhật ký phiên bản: [CHANGELOG.MD](CHANGELOG.MD)
 
-## Giấy phép & đóng góp
+## Giấy phép
 
-TypeVN thuộc bản quyền **vithanhlam**, phát hành dưới [MIT License](LICENSE). Mọi người có thể tham gia phát triển qua [CONTRIBUTING.md](CONTRIBUTING.md) (issue, pull request).
+TypeVN phát hành dưới [MIT License](LICENSE). Mọi contributor được giữ nguyên
+thông tin author trên pull request và commit theo [hướng dẫn đóng góp](CONTRIBUTING.md).
