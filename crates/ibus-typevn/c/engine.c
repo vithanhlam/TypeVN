@@ -10,7 +10,8 @@ enum {
     TYPEVN_ACT_DELETE = 3,
     TYPEVN_ACT_RESET = 4,
     TYPEVN_ACT_COMMIT_THEN_PASS = 5,
-    TYPEVN_ACT_NOTIFY = 6
+    TYPEVN_ACT_NOTIFY = 6,
+    TYPEVN_ACT_COMMIT_THEN_NOTIFY = 7
 };
 
 void *typevn_engine_new(void);
@@ -124,8 +125,10 @@ static gboolean on_usr1(gpointer data) {
     if (!g_active_engine || !g_active_engine->core) {
         return G_SOURCE_CONTINUE;
     }
-    typevn_engine_reload(g_active_engine->core);
     IBusEngine *engine = IBUS_ENGINE(g_active_engine);
+    /* Config reload clears the Rust buffer; drop any stale preedit too. */
+    typevn_engine_reload(g_active_engine->core);
+    hide_preedit(engine, g_active_engine);
     int vni = typevn_engine_get_method(g_active_engine->core);
     int en = typevn_engine_get_english(g_active_engine->core);
     show_status(engine, en ? "TypeVN · Anh" : (vni ? "TypeVN · VNI" : "TypeVN · Việt"));
@@ -184,6 +187,16 @@ ibus_typevn_engine_process_key_event(IBusEngine *engine,
         show_status(engine, text);
         register_typevn_props(engine);
         return TRUE;
+    case TYPEVN_ACT_COMMIT_THEN_NOTIFY: {
+        /* Packed as "commit\0notify" in the same buffer. */
+        const char *notify = text + strlen(text) + 1;
+        do_commit(engine, self, text);
+        if (notify < text + sizeof(text) && notify[0] != '\0') {
+            show_status(engine, notify);
+        }
+        register_typevn_props(engine);
+        return TRUE;
+    }
     case TYPEVN_ACT_RESET:
         typevn_engine_reset(self->core);
         hide_preedit(engine, self);
@@ -202,12 +215,25 @@ ibus_typevn_engine_process_key_event(IBusEngine *engine,
     }
 }
 
+static void ibus_typevn_engine_focus_in(IBusEngine *engine) {
+    IBusTypeVNEngine *self = (IBusTypeVNEngine *)engine;
+    /* Always start a field with a clean composition — avoids stuck buffers
+     * after apps that skip focus_out / hide preedit without reset. */
+    typevn_engine_reset(self->core);
+    hide_preedit(engine, self);
+    IBUS_ENGINE_CLASS(ibus_typevn_engine_parent_class)->focus_in(engine);
+}
+
 static void ibus_typevn_engine_focus_out(IBusEngine *engine) {
     IBusTypeVNEngine *self = (IBusTypeVNEngine *)engine;
     if (self->last_preedit[0] != '\0') {
         do_commit(engine, self, self->last_preedit);
-        typevn_engine_reset(self->core);
     }
+    /* Always reset even when last_preedit was empty: core buffer and IBus
+     * preedit can desync (reload, notify, app quirks). A stuck buffer with
+     * Vietnamese chars makes later keys stay literal — "mất dấu". */
+    typevn_engine_reset(self->core);
+    hide_preedit(engine, self);
     IBUS_ENGINE_CLASS(ibus_typevn_engine_parent_class)->focus_out(engine);
 }
 
@@ -219,6 +245,11 @@ static void ibus_typevn_engine_reset(IBusEngine *engine) {
 }
 
 static void ibus_typevn_engine_enable(IBusEngine *engine) {
+    IBusTypeVNEngine *self = (IBusTypeVNEngine *)engine;
+    /* Re-sync Việt/Anh + method from ~/.config/typevn/config. Fixes the case
+     * where an in-memory English toggle left marks dead until restart. */
+    typevn_engine_reload(self->core);
+    hide_preedit(engine, self);
     register_typevn_props(engine);
     IBUS_ENGINE_CLASS(ibus_typevn_engine_parent_class)->enable(engine);
 }
@@ -259,6 +290,7 @@ static void ibus_typevn_engine_class_init(IBusTypeVNEngineClass *klass) {
 
     object_class->dispose = ibus_typevn_engine_dispose;
     engine_class->process_key_event = ibus_typevn_engine_process_key_event;
+    engine_class->focus_in = ibus_typevn_engine_focus_in;
     engine_class->focus_out = ibus_typevn_engine_focus_out;
     engine_class->reset = ibus_typevn_engine_reset;
     engine_class->enable = ibus_typevn_engine_enable;

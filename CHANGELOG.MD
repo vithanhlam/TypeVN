@@ -2,6 +2,14 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.1.11 — 2026-08-24
+
+Sửa lỗi dùng lâu rồi không gắn dấu được, phải tắt/mở lại.
+
+- `focus_out` / `focus_in` luôn reset buffer (trước đây chỉ reset khi còn preedit → buffer kẹt, phím sau không gắn dấu).
+- `enable` đọc lại config: hết kẹt chế độ Anh trong bộ nhớ dù file vẫn `english=false`.
+- Reload (SIGUSR1) xóa preedit cũ; đổi Việt/Anh giữa từ vẫn hiện **TypeVN · Anh/Việt**.
+
 ## 0.1.10 — 2026-08-22
 
 - Đổi mô tả dưới tiêu đề thành `Bộ gõ tiếng Việt`.

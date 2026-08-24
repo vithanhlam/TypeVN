@@ -8,6 +8,7 @@ fn engine() -> VietnameseEngine {
     eng.set_typing_method(TypingMethod::Telex);
     eng.set_charset(typevn_core::Charset::Unicode);
     eng.set_auto_repair(true);
+    eng.set_hotkeys_enabled(true);
     eng
 }
 
@@ -26,7 +27,11 @@ fn sequential_100k_no_loss() {
                 assert_eq!(s, "tiếng ");
                 commits += 1;
             }
-            EngineAction::Preedit(_) | EngineAction::Reset | EngineAction::PassThrough | EngineAction::Notify(_) => {}
+            EngineAction::Preedit(_)
+            | EngineAction::Reset
+            | EngineAction::PassThrough
+            | EngineAction::Notify(_)
+            | EngineAction::CommitThenNotify(_, _) => {}
             other => panic!("unexpected {other:?}"),
         }
     }

@@ -4,7 +4,9 @@ fn feed(eng: &mut VietnameseEngine, s: &str) -> String {
     let mut committed = String::new();
     for c in s.chars() {
         match eng.process_key(KeyEvent::from_char(c)) {
-            EngineAction::Commit(t) | EngineAction::CommitThenPass(t) => committed.push_str(&t),
+            EngineAction::Commit(t)
+            | EngineAction::CommitThenPass(t)
+            | EngineAction::CommitThenNotify(t, _) => committed.push_str(&t),
             _ => {}
         }
     }
@@ -19,6 +21,7 @@ fn engine() -> VietnameseEngine {
     eng.set_typing_method(TypingMethod::Telex);
     eng.set_charset(typevn_core::Charset::Unicode);
     eng.set_auto_repair(true);
+    eng.set_hotkeys_enabled(true);
     eng
 }
 
@@ -115,4 +118,54 @@ fn pause_toggles_viet_anh() {
     let key = KeyEvent::new(KEY::Pause, 0, Modifiers::default());
     let _ = eng.process_key(key);
     assert_eq!(eng.input_mode(), InputMode::English);
+}
+
+#[test]
+fn shift_space_mid_word_still_notifies_english() {
+    let mut eng = engine();
+    for c in "as".chars() {
+        let _ = eng.process_key(KeyEvent::from_char(c));
+    }
+    let key = KeyEvent::new(
+        KEY::space,
+        0,
+        Modifiers {
+            shift: true,
+            ..Modifiers::default()
+        },
+    );
+    match eng.process_key(key) {
+        EngineAction::CommitThenNotify(commit, msg) => {
+            assert_eq!(commit, "á");
+            assert_eq!(msg, "TypeVN · Anh");
+        }
+        other => panic!("expected CommitThenNotify, got {other:?}"),
+    }
+    assert_eq!(eng.input_mode(), InputMode::English);
+    // English mode must pass tone keys through until toggled back.
+    assert_eq!(
+        eng.process_key(KeyEvent::from_char('a')),
+        EngineAction::PassThrough
+    );
+}
+
+#[test]
+fn reset_clears_stuck_buffer_so_marks_work_again() {
+    let mut eng = engine();
+    // Simulate a desynced leftover composition (focus_out used to skip reset
+    // when IBus preedit was already hidden).
+    for c in "ddax".chars() {
+        let _ = eng.process_key(KeyEvent::from_char(c));
+    }
+    assert_eq!(eng.buffer_str(), "đã");
+    eng.reset();
+    assert_eq!(eng.buffer_str(), "");
+    assert_eq!(
+        eng.process_key(KeyEvent::from_char('a')),
+        EngineAction::Preedit("a".into())
+    );
+    assert_eq!(
+        eng.process_key(KeyEvent::from_char('s')),
+        EngineAction::Preedit("á".into())
+    );
 }

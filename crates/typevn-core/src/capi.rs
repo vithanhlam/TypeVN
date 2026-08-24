@@ -13,6 +13,7 @@ pub const TYPEVN_ACT_DELETE: c_int = 3;
 pub const TYPEVN_ACT_RESET: c_int = 4;
 pub const TYPEVN_ACT_COMMIT_THEN_PASS: c_int = 5;
 pub const TYPEVN_ACT_NOTIFY: c_int = 6;
+pub const TYPEVN_ACT_COMMIT_THEN_NOTIFY: c_int = 7;
 
 #[no_mangle]
 pub extern "C" fn typevn_engine_new() -> *mut VietnameseEngine {
@@ -64,6 +65,16 @@ pub unsafe extern "C" fn typevn_process_key(
         EngineAction::Reset => (TYPEVN_ACT_RESET, String::new(), 0),
         EngineAction::CommitThenPass(s) => (TYPEVN_ACT_COMMIT_THEN_PASS, s, 0),
         EngineAction::Notify(s) => (TYPEVN_ACT_NOTIFY, s, 0),
+        // Notify text is short ("TypeVN · …"); pack as "commit\0notify" when both fit,
+        // otherwise prefer committing leftover and skip the toast.
+        EngineAction::CommitThenNotify(commit, notify) => {
+            let mut packed = commit;
+            if packed.len() + 1 + notify.len() < out_cap {
+                packed.push('\0');
+                packed.push_str(&notify);
+            }
+            (TYPEVN_ACT_COMMIT_THEN_NOTIFY, packed, 0)
+        }
     };
 
     if !delete_count.is_null() {

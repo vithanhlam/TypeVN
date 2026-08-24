@@ -18,7 +18,7 @@ gi.require_version("Adw", "1")
 gi.require_version("Gdk", "4.0")
 from gi.repository import Adw, Gdk, GLib, Gtk
 
-APP_VERSION = "0.1.10"
+APP_VERSION = "0.1.11"
 GITHUB_URL = "https://github.com/vithanhlam/TypeVN"
 GITHUB_RELEASES_API = "https://api.github.com/repos/vithanhlam/TypeVN/releases/latest"
 

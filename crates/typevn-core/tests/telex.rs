@@ -4,8 +4,13 @@ fn feed(eng: &mut VietnameseEngine, s: &str) -> String {
     let mut committed = String::new();
     for c in s.chars() {
         match eng.process_key(KeyEvent::from_char(c)) {
-            EngineAction::Commit(t) | EngineAction::CommitThenPass(t) => committed.push_str(&t),
-            EngineAction::Preedit(_) | EngineAction::PassThrough | EngineAction::Reset | EngineAction::Notify(_) => {}
+            EngineAction::Commit(t)
+            | EngineAction::CommitThenPass(t)
+            | EngineAction::CommitThenNotify(t, _) => committed.push_str(&t),
+            EngineAction::Preedit(_)
+            | EngineAction::PassThrough
+            | EngineAction::Reset
+            | EngineAction::Notify(_) => {}
             EngineAction::Delete(_) => {}
         }
     }
@@ -20,6 +25,7 @@ fn engine() -> VietnameseEngine {
     eng.set_typing_method(typevn_core::TypingMethod::Telex);
     eng.set_charset(Charset::Unicode);
     eng.set_auto_repair(true);
+    eng.set_hotkeys_enabled(true);
     eng
 }
 

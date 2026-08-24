@@ -39,6 +39,8 @@ pub enum EngineAction {
     CommitThenPass(String),
     /// Hotkey consumed; show a short IBus status (Telex / VNI / Anh).
     Notify(String),
+    /// Commit leftover composition, then show a status (mode / method change).
+    CommitThenNotify(String, String),
 }
 
 pub struct VietnameseEngine {
@@ -143,6 +145,10 @@ impl VietnameseEngine {
         self.auto_repair = !self.auto_repair;
     }
 
+    pub fn set_hotkeys_enabled(&mut self, on: bool) {
+        self.hotkeys_enabled = on;
+    }
+
     pub fn cycle_charset(&mut self) {
         self.charset = self.charset.next();
     }
@@ -216,7 +222,7 @@ impl VietnameseEngine {
             if leftover.is_empty() {
                 return EngineAction::Notify(msg.into());
             }
-            return EngineAction::Commit(leftover);
+            return EngineAction::CommitThenNotify(leftover, msg.into());
         }
 
         if self.hotkeys_enabled && self.is_method_hotkey(key) {
@@ -235,7 +241,7 @@ impl VietnameseEngine {
             if leftover.is_empty() {
                 return EngineAction::Notify(msg.into());
             }
-            return EngineAction::Commit(leftover);
+            return EngineAction::CommitThenNotify(leftover, msg.into());
         }
 
         if self.hotkeys_enabled && self.is_option_hotkey(key) {
@@ -256,7 +262,7 @@ impl VietnameseEngine {
             if leftover.is_empty() {
                 return EngineAction::Notify(msg);
             }
-            return EngineAction::Commit(leftover);
+            return EngineAction::CommitThenNotify(leftover, msg);
         }
 
         if self.should_passthrough_shortcut(key) {
