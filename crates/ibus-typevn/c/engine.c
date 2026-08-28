@@ -19,6 +19,7 @@ void typevn_engine_free(void *eng);
 void typevn_engine_reset(void *eng);
 int typevn_engine_get_method(void *eng);
 int typevn_engine_get_english(void *eng);
+unsigned int typevn_engine_get_preedit_delay_ms(void *eng);
 void typevn_engine_set_method(void *eng, int vni);
 void typevn_engine_set_english(void *eng, int en);
 void typevn_engine_reload(void *eng);
@@ -37,6 +38,7 @@ struct _IBusTypeVNEngine {
     IBusEngine parent;
     void *core;
     char last_preedit[256];
+    guint preedit_timeout_id;
 };
 
 struct _IBusTypeVNEngineClass {
@@ -48,8 +50,24 @@ G_DEFINE_TYPE(IBusTypeVNEngine, ibus_typevn_engine, IBUS_TYPE_ENGINE)
 static IBusTypeVNEngine *g_active_engine = NULL;
 static void show_status(IBusEngine *engine, const char *msg);
 static void register_typevn_props(IBusEngine *engine);
+static void do_commit(IBusEngine *engine, IBusTypeVNEngine *self, const char *text);
+
+static gboolean commit_idle_preedit_cb(gpointer data) {
+    IBusTypeVNEngine *self = (IBusTypeVNEngine *)data;
+    self->preedit_timeout_id = 0;
+    if (self->last_preedit[0] != '\0') {
+        IBusEngine *engine = IBUS_ENGINE(self);
+        do_commit(engine, self, self->last_preedit);
+        typevn_engine_reset(self->core);
+    }
+    return G_SOURCE_REMOVE;
+}
 
 static void hide_preedit(IBusEngine *engine, IBusTypeVNEngine *self) {
+    if (self->preedit_timeout_id != 0) {
+        g_source_remove(self->preedit_timeout_id);
+        self->preedit_timeout_id = 0;
+    }
     IBusText *empty = ibus_text_new_from_static_string("");
     ibus_engine_update_preedit_text(engine, empty, 0, FALSE);
     ibus_engine_hide_preedit_text(engine);
@@ -63,19 +81,25 @@ static void show_preedit(IBusEngine *engine, IBusTypeVNEngine *self, const char 
     g_strlcpy(self->last_preedit, text, sizeof(self->last_preedit));
     IBusText *t = ibus_text_new_from_string(text);
     guint len = (guint)g_utf8_strlen(text, -1);
-    ibus_text_append_attribute(
-        t, IBUS_ATTR_TYPE_UNDERLINE, IBUS_ATTR_UNDERLINE_SINGLE, 0, len);
-    ibus_engine_update_preedit_text(engine, t, len, TRUE);
+    ibus_text_append_attribute(t, IBUS_ATTR_TYPE_UNDERLINE,
+                               IBUS_ATTR_UNDERLINE_NONE, 0, len);
+    ibus_engine_update_preedit_text_with_mode(
+        engine, t, len, TRUE, IBUS_ENGINE_PREEDIT_COMMIT);
+    if (self->preedit_timeout_id != 0) {
+        g_source_remove(self->preedit_timeout_id);
+    }
+    self->preedit_timeout_id = g_timeout_add(
+        typevn_engine_get_preedit_delay_ms(self->core), commit_idle_preedit_cb, self);
 }
 
 static void do_commit(IBusEngine *engine, IBusTypeVNEngine *self, const char *text) {
     char tmp[256];
     g_strlcpy(tmp, text ? text : "", sizeof(tmp));
-    hide_preedit(engine, self);
     if (tmp[0] != '\0') {
         IBusText *t = ibus_text_new_from_string(tmp);
         ibus_engine_commit_text(engine, t);
     }
+    hide_preedit(engine, self);
 }
 
 static gboolean hide_aux_cb(gpointer data) {
@@ -264,6 +288,7 @@ static void ibus_typevn_engine_disable(IBusEngine *engine) {
 static void ibus_typevn_engine_init(IBusTypeVNEngine *self) {
     self->core = typevn_engine_new();
     self->last_preedit[0] = '\0';
+    self->preedit_timeout_id = 0;
     g_active_engine = self;
     static gsize once = 0;
     if (g_once_init_enter(&once)) {
@@ -274,6 +299,10 @@ static void ibus_typevn_engine_init(IBusTypeVNEngine *self) {
 
 static void ibus_typevn_engine_dispose(GObject *object) {
     IBusTypeVNEngine *self = (IBusTypeVNEngine *)object;
+    if (self->preedit_timeout_id != 0) {
+        g_source_remove(self->preedit_timeout_id);
+        self->preedit_timeout_id = 0;
+    }
     if (self->core) {
         typevn_engine_free(self->core);
         self->core = NULL;

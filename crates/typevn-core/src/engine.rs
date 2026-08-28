@@ -56,6 +56,7 @@ pub struct VietnameseEngine {
     charset: Charset,
     auto_repair: bool,
     hotkeys_enabled: bool,
+    preedit_delay_ms: u32,
     macros: MacroStore,
 }
 
@@ -87,6 +88,7 @@ impl VietnameseEngine {
             charset: cfg.charset,
             auto_repair: cfg.auto_repair,
             hotkeys_enabled: cfg.hotkeys_enabled,
+            preedit_delay_ms: cfg.preedit_delay_ms,
             macros: MacroStore::load(),
         }
     }
@@ -141,6 +143,10 @@ impl VietnameseEngine {
         self.auto_repair = on;
     }
 
+    pub fn preedit_delay_ms(&self) -> u32 {
+        self.preedit_delay_ms
+    }
+
     pub fn toggle_auto_repair(&mut self) {
         self.auto_repair = !self.auto_repair;
     }
@@ -177,6 +183,7 @@ impl VietnameseEngine {
         self.charset = cfg.charset;
         self.auto_repair = cfg.auto_repair;
         self.hotkeys_enabled = cfg.hotkeys_enabled;
+        self.preedit_delay_ms = cfg.preedit_delay_ms;
         self.clear_buffer();
     }
 

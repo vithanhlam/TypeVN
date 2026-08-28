@@ -18,7 +18,7 @@ gi.require_version("Adw", "1")
 gi.require_version("Gdk", "4.0")
 from gi.repository import Adw, Gdk, GLib, Gtk
 
-APP_VERSION = "0.1.11"
+APP_VERSION = "0.2.2"
 GITHUB_URL = "https://github.com/vithanhlam/TypeVN"
 GITHUB_RELEASES_API = "https://api.github.com/repos/vithanhlam/TypeVN/releases/latest"
 
@@ -35,6 +35,7 @@ DEFAULTS = {
     "hotkey_telex": "<Control><Shift>exclam",
     "hotkey_vni": "<Control><Shift>at",
     "hotkeys_enabled": "true",
+    "preedit_delay_ms": "800",
 }
 
 AUTOSTART_PATH = Path.home() / ".config" / "autostart" / "typevn.desktop"
@@ -77,6 +78,7 @@ def save_config(data):
         "hotkey_telex",
         "hotkey_vni",
         "hotkeys_enabled",
+        "preedit_delay_ms",
     ]
     tmp = CONFIG_PATH.with_suffix(".tmp")
     tmp.write_text(
@@ -370,6 +372,17 @@ class TypeVnPrefs(Adw.Application):
         except ValueError:
             charset_row.set_selected(0)
         typing.add(charset_row)
+        delay_ids = ["300", "500", "800", "1200", "1600", "2000"]
+        delay_row = Adw.ComboRow(
+            title="Thời gian hoàn thành",
+            subtitle="Thời gian chờ sau phím cuối trước khi chốt chữ",
+        )
+        delay_row.set_model(Gtk.StringList.new([f"{v} ms" for v in delay_ids]))
+        try:
+            delay_row.set_selected(delay_ids.index(cfg.get("preedit_delay_ms", "800")))
+        except ValueError:
+            delay_row.set_selected(2)
+        typing.add(delay_row)
         page.add(typing)
 
         repair = Adw.PreferencesGroup(title="Sửa dấu")
@@ -489,6 +502,7 @@ class TypeVnPrefs(Adw.Application):
                 "hotkey_telex": hotkey_state["hotkey_telex"],
                 "hotkey_vni": hotkey_state["hotkey_vni"],
                 "hotkeys_enabled": "true" if hotkeys_row.get_active() else "false",
+                "preedit_delay_ms": delay_ids[delay_row.get_selected()],
             }
             save_config(data)
             set_autostart(start_row.get_active())
@@ -501,6 +515,7 @@ class TypeVnPrefs(Adw.Application):
         start_row.connect("notify::active", persist)
         viet_row.connect("notify::active", persist)
         hotkeys_row.connect("notify::active", lambda *_: (update_hotkey_rows(), persist()))
+        delay_row.connect("notify::selected", persist)
         loading = False
         sync_gnome_hotkeys(cfg)
 

@@ -109,6 +109,11 @@ pub unsafe extern "C" fn typevn_engine_get_english(eng: *mut VietnameseEngine) -
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn typevn_engine_get_preedit_delay_ms(eng: *mut VietnameseEngine) -> u32 {
+    eng.as_ref().map(|e| e.preedit_delay_ms()).unwrap_or(800)
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn typevn_engine_set_method(eng: *mut VietnameseEngine, vni: c_int) {
     if let Some(e) = eng.as_mut() {
         e.set_typing_method(if vni != 0 {

@@ -2,6 +2,31 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.2.2 — 2026-08-28
+
+- Thêm tuỳ chọn thời gian tự hoàn thành chữ trong Settings.
+
+## 0.2.1 — 2026-08-28
+
+- Hoàn tác commit-and-replace vì Terminal không hỗ trợ xóa surrounding text ổn định.
+
+## 0.2.0 — 2026-08-28
+
+- Chuyển sang mô hình commit rồi thay thế để không còn preedit/gạch chân.
+
+## 0.1.14 — 2026-08-28
+
+- Tự commit preedit sau một khoảng ngắn không có phím mới.
+
+## 0.1.13 — 2026-08-28
+
+- Tự commit preedit khi ứng dụng mất focus.
+
+## 0.1.12 — 2026-08-28
+
+- Tắt gạch chân preedit mặc định của IBus.
+- Commit chữ đang gõ trước khi mất focus để không mất từ cuối.
+
 ## 0.1.11 — 2026-08-24
 
 Sửa lỗi dùng lâu rồi không gắn dấu được, phải tắt/mở lại.

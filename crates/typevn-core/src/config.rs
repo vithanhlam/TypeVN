@@ -12,6 +12,7 @@ pub struct TypeVnConfig {
     pub auto_start: bool,
     pub english: bool,
     pub hotkeys_enabled: bool,
+    pub preedit_delay_ms: u32,
 }
 
 impl Default for TypeVnConfig {
@@ -23,6 +24,7 @@ impl Default for TypeVnConfig {
             auto_start: true,
             english: false,
             hotkeys_enabled: true,
+            preedit_delay_ms: 800,
         }
     }
 }
@@ -75,6 +77,9 @@ pub fn load() -> TypeVnConfig {
             "hotkeys_enabled" => {
                 cfg.hotkeys_enabled = !matches!(v.trim(), "0" | "false" | "off");
             }
+            "preedit_delay_ms" => {
+                cfg.preedit_delay_ms = v.trim().parse::<u32>().unwrap_or(800).clamp(100, 3000);
+            }
             _ => {}
         }
     }
@@ -108,7 +113,7 @@ pub fn save(cfg: &TypeVnConfig) -> std::io::Result<()> {
             if matches!(
                 k,
                 "method" | "charset" | "auto_repair" | "auto_start" | "english"
-                    | "hotkeys_enabled"
+                    | "hotkeys_enabled" | "preedit_delay_ms"
             ) {
                 continue;
             }
@@ -117,7 +122,7 @@ pub fn save(cfg: &TypeVnConfig) -> std::io::Result<()> {
         }
     }
     let body = format!(
-        "method={}\ncharset={}\nauto_repair={}\nauto_start={}\nenglish={}\nhotkeys_enabled={}\n{extras}",
+        "method={}\ncharset={}\nauto_repair={}\nauto_start={}\nenglish={}\nhotkeys_enabled={}\npreedit_delay_ms={}\n{extras}",
         if cfg.method_vni { "vni" } else { "telex" },
         match cfg.charset {
             Charset::Unicode => "unicode",
@@ -129,6 +134,7 @@ pub fn save(cfg: &TypeVnConfig) -> std::io::Result<()> {
         if cfg.auto_start { "true" } else { "false" },
         if cfg.english { "true" } else { "false" },
         if cfg.hotkeys_enabled { "true" } else { "false" },
+        cfg.preedit_delay_ms,
     );
     fs::write(path, body)
 }

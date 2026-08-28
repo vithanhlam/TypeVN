@@ -30,6 +30,7 @@ pub fn link_capi() {
     let _ = capi::typevn_process_key as *const ();
     let _ = capi::typevn_engine_get_method as *const ();
     let _ = capi::typevn_engine_get_english as *const ();
+    let _ = capi::typevn_engine_get_preedit_delay_ms as *const ();
     let _ = capi::typevn_engine_set_method as *const ();
     let _ = capi::typevn_engine_set_english as *const ();
     let _ = capi::typevn_engine_reload as *const ();
