@@ -23,6 +23,7 @@ Engine xử lý phím viết bằng **Rust** (đồng bộ, không queue, không
 - Tự đặt dấu tiếng Việt, tự sửa trạng thái Telex và macro sửa lỗi bằng JSON.
 - Giữ nguyên tiếng Anh, username, mã sản phẩm và chuỗi kỹ thuật không hợp lệ.
 - Backspace hoàn tác theo từng phím; buffer dài không bị cắt.
+- Tự chốt chữ sau khi ngừng gõ; thời gian có thể chỉnh từ 300 đến 2000 ms trong TypeVN Settings.
 - Tối ưu cho Ubuntu GNOME / Wayland, mục tiêu dưới 1 ms mỗi keypress.
 
 <p align="center">
@@ -40,16 +41,16 @@ Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (k
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
-1. Tải file: [ibus-typevn_0.1.10_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.1.10/ibus-typevn_0.1.10_amd64.deb)
+1. Tải file: [ibus-typevn_0.2.2_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.2.2/ibus-typevn_0.2.2_amd64.deb)
 2. Mở Terminal trong thư mục vừa tải, chạy:
 
 ```bash
-sudo apt install ./ibus-typevn_0.1.10_amd64.deb
+sudo apt install ./ibus-typevn_0.2.2_amd64.deb
 ```
 
 3. **Settings → Keyboard → Input Sources → Add → Vietnamese → TypeVN**  
    hoặc nhấn **Super+Space** đến khi thấy TypeVN / VN.
-4. Mở app **TypeVN** (hoặc `typevn-settings`) để chọn Telex/VNI, tự sửa dấu, tự bật lúc đăng nhập.
+4. Mở app **TypeVN** (hoặc `typevn-settings`) để chọn Telex/VNI, tự sửa dấu, thời gian tự chốt chữ và tự bật lúc đăng nhập.
 
 ### Cách 2 — Snap (Snap Store)
 
@@ -86,7 +87,11 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 
 1. Chọn nguồn nhập **TypeVN** (Super+Space).
 2. Gõ Telex hoặc VNI như bảng dưới.
-3. Tùy chỉnh trong **TypeVN** (ảnh phía trên): bảng gõ, bảng mã, tự sửa dấu, tự chạy khi đăng nhập.
+3. Tùy chỉnh trong **TypeVN** (ảnh phía trên): bảng gõ, bảng mã, tự sửa dấu, thời gian tự chốt chữ và tự chạy khi đăng nhập.
+
+### Thời gian tự chốt chữ
+
+TypeVN giữ phần chữ cuối trong thời gian ngắn để vẫn có thể xử lý dấu Telex/VNI. Khi ngừng gõ, phần chữ này sẽ tự hoàn thành. Người gõ nhanh có thể chọn `300–500 ms`; người gõ chậm nên chọn `1200–2000 ms` trong **TypeVN Settings → Kiểu gõ → Thời gian hoàn thành**. Mặc định là `800 ms`.
 
 ### Telex (mặc định)
 
