@@ -343,18 +343,25 @@ impl VietnameseEngine {
                     .get(self.undo.len().saturating_sub(2))
                     .cloned()
                     .unwrap_or_default();
-                let becomes_literal = self.literal_token
-                    || is_tech_prefix(&self.raw_buffer, Some(ch))
-                    || (last_syllable_start(&self.buffer) > 0
-                        && self.buffer.iter().any(|c| !c.is_ascii()));
                 self.raw_buffer.push(ch);
-                if becomes_literal {
+                // Tech prefixes and already-literal tokens stay ASCII.
+                // After Telex/VNI, rewind tentative marks once the token is no
+                // longer a single open Vietnamese syllable (foreign shape or
+                // glued multi-syllable). Only rewind when marks are present so
+                // Unikey-style undo of `aa`/`ww` is preserved.
+                if self.literal_token || is_tech_prefix(&self.raw_buffer, None) {
                     self.literal_token = true;
                     self.buffer.clone_from(&self.raw_buffer);
                 } else {
                     match self.typing_method {
                         TypingMethod::Telex => apply_telex(&mut self.buffer, ch, &origin),
                         TypingMethod::Vni => apply_vni(&mut self.buffer, ch, &origin),
+                    }
+                    if last_syllable_start(&self.buffer) > 0
+                        && self.buffer.iter().any(|c| !c.is_ascii())
+                    {
+                        self.literal_token = true;
+                        self.buffer.clone_from(&self.raw_buffer);
                     }
                 }
                 if self.auto_repair && !self.literal_token {
@@ -388,11 +395,11 @@ impl VietnameseEngine {
             pop_char(&mut self.buffer);
         }
         self.raw_buffer.pop();
-        // Re-evaluate on the next key after deleting back into the ambiguous
-        // part of a token.
-        self.literal_token = self.buffer == self.raw_buffer
-            && last_syllable_start(&self.buffer) > 0
-            && self.buffer.iter().any(|c| !c.is_ascii());
+        // Keep sticky-ASCII only while the remaining token still looks
+        // foreign/tech; otherwise the next key can take marks again.
+        self.literal_token = !self.raw_buffer.is_empty()
+            && self.buffer == self.raw_buffer
+            && (last_syllable_start(&self.buffer) > 0 || is_tech_prefix(&self.raw_buffer, None));
         self.cursor = self.buffer.len();
         if self.buffer.is_empty() {
             return EngineAction::Reset;

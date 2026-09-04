@@ -139,8 +139,11 @@ fn disabling_auto_repair_disables_macros() {
 
 #[test]
 fn short_technical_prefixes_do_not_block_vietnamese_telex() {
+    // Min length 4: `tru` must stay open for `trưa` / `trước` / `trường`.
     assert_eq!(telex("true"), "true");
     assert_eq!(telex("console"), "console");
+    assert_eq!(telex("Truwa"), "Trưa");
+    assert_eq!(telex("Truowng"), "Trương");
     assert_eq!(telex("Truowsc"), "Trước");
 }
 
@@ -194,6 +197,18 @@ fn tech_passthrough_console() {
     assert_eq!(telex("class"), "class");
     assert_eq!(telex("const"), "const");
     assert_eq!(telex("status"), "status");
+    // VN-shaped English that would otherwise take Telex marks.
+    assert_eq!(telex("data"), "data");
+    assert_eq!(telex("test"), "test");
+    assert_eq!(telex("text"), "text");
+    assert_eq!(telex("list"), "list");
+    assert_eq!(telex("user"), "user");
+    assert_eq!(telex("root"), "root");
+    assert_eq!(telex("info"), "info");
+    assert_eq!(telex("query"), "query");
+    assert_eq!(telex("error"), "error");
+    assert_eq!(telex("write"), "write");
+    assert_eq!(telex("warn"), "warn");
 }
 
 #[test]
@@ -284,6 +299,16 @@ fn adjacent_ascii_tokens_do_not_keep_tentative_telex_marks() {
     assert_eq!(telex("wordpressplugin"), "wordpressplugin");
     assert_eq!(telex("xinchaof"), "xinchaof");
     assert_eq!(telex("vithanhlams"), "vithanhlams");
+}
+
+#[test]
+fn foreign_shape_rewinds_tentative_marks() {
+    // Marks applied early must unwind once the token is clearly not Vietnamese.
+    assert_eq!(telex("write"), "write");
+    assert_eq!(telex("world"), "world");
+    assert_eq!(telex("google"), "google");
+    assert_eq!(telex("info"), "info");
+    assert_eq!(telex("error"), "error");
 }
 
 #[test]
