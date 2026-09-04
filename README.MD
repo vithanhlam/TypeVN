@@ -21,7 +21,7 @@ Engine xử lý phím viết bằng **Rust** (đồng bộ, không queue, không
 
 - Telex và VNI, Unicode, VNI Windows, VIQR và TCVN3.
 - Tự đặt dấu tiếng Việt, tự sửa trạng thái Telex và macro sửa lỗi bằng JSON.
-- Giữ nguyên tiếng Anh, username, mã sản phẩm và chuỗi kỹ thuật không hợp lệ.
+- Giữ nguyên tiếng Anh, username, mã sản phẩm và chuỗi kỹ thuật không hợp lệ (bảng từ kỹ thuật + rewind dấu khi token không còn dạng âm tiết Việt).
 - Backspace hoàn tác theo từng phím; buffer dài không bị cắt.
 - Tự chốt chữ sau khi ngừng gõ; thời gian có thể chỉnh từ 300 đến 2000 ms trong TypeVN Settings.
 - Tối ưu cho Ubuntu GNOME / Wayland, mục tiêu dưới 1 ms mỗi keypress.
@@ -41,11 +41,11 @@ Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (k
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
-1. Tải file: [ibus-typevn_0.2.2_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.2.2/ibus-typevn_0.2.2_amd64.deb)
+1. Tải file: [ibus-typevn_0.2.3_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.2.3/ibus-typevn_0.2.3_amd64.deb)
 2. Mở Terminal trong thư mục vừa tải, chạy:
 
 ```bash
-sudo apt install ./ibus-typevn_0.2.2_amd64.deb
+sudo apt install ./ibus-typevn_0.2.3_amd64.deb
 ```
 
 3. **Settings → Keyboard → Input Sources → Add → Vietnamese → TypeVN**  

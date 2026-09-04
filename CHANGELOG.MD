@@ -2,6 +2,12 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.2.3 — 2026-09-04
+
+- Mở rộng bảng từ kỹ thuật/English passthrough; rewind dấu tạm khi token thành dạng không phải tiếng Việt.
+- Bổ sung macro sửa lỗi Telex phổ biến trong `data/macros.json`.
+- Gói: **`ibus-typevn_0.2.3_amd64.deb`**.
+
 ## 0.2.2 — 2026-08-28
 
 - Thêm tuỳ chọn thời gian tự hoàn thành chữ trong Settings.
