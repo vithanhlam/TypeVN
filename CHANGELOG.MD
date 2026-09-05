@@ -2,6 +2,11 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## 0.2.4 — 2026-09-05
+
+- Sửa lỗi: bỏ `root`, `then`, `main` khỏi bảng từ kỹ thuật/English passthrough — các từ này trùng âm tiết tiếng Việt mở, khiến gõ Telex (vd. `roots` → rốt, `thenj` → thẹn) bị khoá thành chữ Latin và mất dấu.
+- Gói: **`ibus-typevn_0.2.4_amd64.deb`**.
+
 ## 0.2.3 — 2026-09-04
 
 - Mở rộng bảng từ kỹ thuật/English passthrough; rewind dấu tạm khi token thành dạng không phải tiếng Việt.

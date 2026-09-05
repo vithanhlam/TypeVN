@@ -3,7 +3,7 @@
     <name>org.freedesktop.IBus.TypeVN</name>
     <description>TypeVN Vietnamese Input Method</description>
     <exec>@EXEC@ --ibus</exec>
-    <version>0.2.3</version>
+    <version>0.2.4</version>
     <author>vithanhlam</author>
     <license>MIT</license>
     <homepage>https://github.com/vithanhlam/TypeVN</homepage>

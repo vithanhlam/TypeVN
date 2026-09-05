@@ -41,11 +41,11 @@ Chọn **một** cách. Sau khi cài, phải chọn nguồn nhập **TypeVN** (k
 
 ### Cách 1 — Gói `.deb` (nhanh)
 
-1. Tải file: [ibus-typevn_0.2.3_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.2.3/ibus-typevn_0.2.3_amd64.deb)
+1. Tải file: [ibus-typevn_0.2.4_amd64.deb](https://github.com/vithanhlam/TypeVN/releases/download/v0.2.4/ibus-typevn_0.2.4_amd64.deb)
 2. Mở Terminal trong thư mục vừa tải, chạy:
 
 ```bash
-sudo apt install ./ibus-typevn_0.2.3_amd64.deb
+sudo apt install ./ibus-typevn_0.2.4_amd64.deb
 ```
 
 3. **Settings → Keyboard → Input Sources → Add → Vietnamese → TypeVN**  
