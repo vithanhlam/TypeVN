@@ -203,12 +203,22 @@ fn tech_passthrough_console() {
     assert_eq!(telex("text"), "text");
     assert_eq!(telex("list"), "list");
     assert_eq!(telex("user"), "user");
-    assert_eq!(telex("root"), "root");
     assert_eq!(telex("info"), "info");
     assert_eq!(telex("query"), "query");
     assert_eq!(telex("error"), "error");
     assert_eq!(telex("write"), "write");
     assert_eq!(telex("warn"), "warn");
+}
+
+#[test]
+fn tech_word_removed_from_list_does_not_block_matching_vietnamese_syllable() {
+    // "root", "then", "main" were briefly added to the tech list; each is
+    // also a valid open Vietnamese syllable, so they must not lock the
+    // buffer to literal ASCII before a tone key arrives.
+    assert_eq!(telex("roots"), "rốt");
+    assert_eq!(telex("thenj"), "thẹn");
+    assert_eq!(telex("then"), "then");
+    assert_eq!(telex("main"), "main");
 }
 
 #[test]
