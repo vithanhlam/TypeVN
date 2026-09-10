@@ -81,6 +81,38 @@ Script sẽ build, đăng ký IBus, bật TypeVN trên GNOME. Không cần sudo 
 - Bản snap: `sudo snap remove typevn`
 - Bản `./setup.sh`: `./scripts/uninstall-dev.sh`
 
+### WezTerm trên GNOME Wayland
+
+Nếu TypeVN gõ được ở ứng dụng khác nhưng trong WezTerm lúc được lúc không, hãy
+giữ WezTerm ở chế độ Wayland native và bật IME:
+
+```lua
+config.enable_wayland = true
+config.use_ime = true
+```
+
+Không nên ép `config.enable_wayland = false` nếu đường X11/XIM làm lỗi dấu.
+Nên cập nhật WezTerm lên bản mới nhất rồi thoát hoàn toàn và mở lại WezTerm
+để áp dụng cấu hình.
+
+Nếu cần kéo, phóng to và thu nhỏ cửa sổ thuận tiện trên Wayland, có thể dùng
+nút quản lý cửa sổ tích hợp trên thanh tab:
+
+```lua
+config.window_decorations = 'INTEGRATED_BUTTONS | RESIZE'
+config.integrated_title_button_style = 'Gnome'
+config.integrated_title_button_alignment = 'Right'
+config.hide_tab_bar_if_only_one_tab = false
+```
+
+Khi đó có thể kéo cửa sổ bằng thanh tab và dùng các nút GNOME để thu nhỏ,
+phóng to hoặc đóng cửa sổ. Nếu WezTerm vẫn mất IME sau khi đổi focus, chạy:
+
+```bash
+ibus engine typevn
+pkill -USR1 -x ibus-typevn
+```
+
 ---
 
 ## Cách gõ
