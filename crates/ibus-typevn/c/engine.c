@@ -39,6 +39,7 @@ struct _IBusTypeVNEngine {
     void *core;
     char last_preedit[256];
     guint preedit_timeout_id;
+    gboolean secret_field;
 };
 
 struct _IBusTypeVNEngineClass {
@@ -195,6 +196,9 @@ ibus_typevn_engine_process_key_event(IBusEngine *engine,
     if (modifiers & IBUS_IGNORED_MASK) {
         return FALSE;
     }
+    if (self->secret_field) {
+        return FALSE;
+    }
 
     text[0] = '\0';
     kind = typevn_process_key(self->core, keyval, keycode, modifiers, text, sizeof(text), &del);
@@ -268,6 +272,26 @@ static void ibus_typevn_engine_reset(IBusEngine *engine) {
     IBUS_ENGINE_CLASS(ibus_typevn_engine_parent_class)->reset(engine);
 }
 
+static void ibus_typevn_engine_set_content_type(IBusEngine *engine, guint purpose,
+                                                guint hints) {
+    IBusTypeVNEngine *self = (IBusTypeVNEngine *)engine;
+    /* Password/PIN fields get raw keys. Lets users keep TypeVN as the only
+     * input source: GNOME Shell only drops IBus engines on password fields
+     * when an XKB source exists, and with WezTerm (text-input-v3) that state
+     * sticks — "VN" vanishes from the top bar until focusing another app. */
+    gboolean secret = purpose == IBUS_INPUT_PURPOSE_PASSWORD ||
+                      purpose == IBUS_INPUT_PURPOSE_PIN;
+    if (secret != self->secret_field) {
+        typevn_engine_reset(self->core);
+        hide_preedit(engine, self);
+        self->secret_field = secret;
+    }
+    IBusEngineClass *parent = IBUS_ENGINE_CLASS(ibus_typevn_engine_parent_class);
+    if (parent->set_content_type) {
+        parent->set_content_type(engine, purpose, hints);
+    }
+}
+
 static void ibus_typevn_engine_enable(IBusEngine *engine) {
     IBusTypeVNEngine *self = (IBusTypeVNEngine *)engine;
     /* Re-sync Việt/Anh + method from ~/.config/typevn/config. Fixes the case
@@ -289,6 +313,7 @@ static void ibus_typevn_engine_init(IBusTypeVNEngine *self) {
     self->core = typevn_engine_new();
     self->last_preedit[0] = '\0';
     self->preedit_timeout_id = 0;
+    self->secret_field = FALSE;
     g_active_engine = self;
     static gsize once = 0;
     if (g_once_init_enter(&once)) {
@@ -325,4 +350,5 @@ static void ibus_typevn_engine_class_init(IBusTypeVNEngineClass *klass) {
     engine_class->enable = ibus_typevn_engine_enable;
     engine_class->disable = ibus_typevn_engine_disable;
     engine_class->property_activate = ibus_typevn_property_activate;
+    engine_class->set_content_type = ibus_typevn_engine_set_content_type;
 }

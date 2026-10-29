@@ -2,6 +2,10 @@
 
 Mọi ngày theo giờ máy (UTC+7).
 
+## Chưa phát hành
+
+- Ô mật khẩu/PIN: engine cho phím đi thẳng, không bỏ dấu. Nhờ vậy có thể để TypeVN là nguồn nhập duy nhất — tránh lỗi GNOME tắt IBus khi gặp ô mật khẩu rồi kẹt lại (mất "VN" trên thanh trên, nhất là trong WezTerm) cho đến khi chuyển sang app khác.
+
 ## 0.2.4 — 2026-09-05
 
 - Sửa lỗi: bỏ `root`, `then`, `main` khỏi bảng từ kỹ thuật/English passthrough — các từ này trùng âm tiết tiếng Việt mở, khiến gõ Telex (vd. `roots` → rốt, `thenj` → thẹn) bị khoá thành chữ Latin và mất dấu.
