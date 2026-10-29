@@ -3,8 +3,8 @@
 use crate::english::is_tech_prefix;
 use crate::syllable::last_syllable_start;
 use crate::telex::{
-    apply_circumflex, apply_dd, apply_horn_or_breve, apply_tone, merge_uhorn_o, strip_tones,
-    undo_repeat_mark,
+    apply_circumflex, apply_dd, apply_horn_or_breve, apply_interjection_tone, apply_tone,
+    merge_uhorn_o, strip_tones, undo_repeat_mark,
 };
 use crate::vowel::{parse_vowel, tone_from_vni};
 use crate::MAX_COMPOSE_CHARS;
@@ -20,6 +20,10 @@ pub fn apply_vni(buf: &mut Vec<char>, c: char, origin: &[char]) {
 
     if is_tech_prefix(buf, Some(c)) {
         buf.push(c);
+        return;
+    }
+
+    if tone_from_vni(c).is_some_and(|t| apply_interjection_tone(buf, t)) {
         return;
     }
 

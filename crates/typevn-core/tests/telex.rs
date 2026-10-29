@@ -381,3 +381,39 @@ fn vietnamese_clusters_keep_working() {
     assert_eq!(telex("hoocj"), "hộc");
     assert_eq!(telex("nghix"), "nghĩ");
 }
+
+#[test]
+fn colloquial_dz_and_z_onsets() {
+    assert_eq!(telex("dzoo"), "dzô");
+    assert_eq!(telex("dzoof"), "dzồ");
+    assert_eq!(telex("dzaajy"), "dzậy");
+    assert_eq!(telex("Dzoo dzoo"), "Dzô dzô");
+    assert_eq!(telex("zoo"), "zô");
+    assert_eq!(telex("zaajy"), "zậy");
+    assert_eq!(telex("zui"), "zui");
+    // English z-words stay literal.
+    assert_eq!(telex("zoom"), "zoom");
+    assert_eq!(telex("zero"), "zero");
+    assert_eq!(telex("zone"), "zone");
+    assert_eq!(telex("zsh"), "zsh");
+}
+
+#[test]
+fn colloquial_interjection_h() {
+    assert_eq!(telex("afh"), "àh");
+    assert_eq!(telex("ahf"), "àh");
+    assert_eq!(telex("ajh"), "ạh");
+    assert_eq!(telex("ahj"), "ạh");
+    assert_eq!(telex("uwfh"), "ừh");
+    assert_eq!(telex("owfh"), "ờh");
+    assert_eq!(telex("Afh"), "Àh");
+    assert_eq!(telex("ahff"), "ahf");
+    // English words with a vowel + `h` stay literal.
+    assert_eq!(telex("ah"), "ah");
+    assert_eq!(telex("oh"), "oh");
+    assert_eq!(telex("aha"), "aha");
+    assert_eq!(telex("hash"), "hash");
+    assert_eq!(telex("bash"), "bash");
+    assert_eq!(telex("Sarah"), "Sarah");
+    assert_eq!(telex("yeah"), "yeah");
+}

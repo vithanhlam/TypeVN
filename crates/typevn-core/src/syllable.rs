@@ -7,6 +7,9 @@
 use crate::vowel::{is_d, is_dd, is_vowel, parse_vowel};
 
 pub(crate) fn last_syllable_start(buf: &[char]) -> usize {
+    if is_interjection_h(buf) && !buf[0].is_ascii() {
+        return 0;
+    }
     let Some(last_v) = buf.iter().rposition(|&c| is_vowel(c)) else {
         return 0;
     };
@@ -35,6 +38,13 @@ pub(crate) fn last_syllable_start(buf: &[char]) -> usize {
         return buf.len();
     }
     start
+}
+
+/// Colloquial `àh`, `ạh`, `ừh`, `ờh`: a lone vowel followed by `h`. Only a
+/// marked vowel opens a syllable, so English `ah`, `aha`, `hash` stay literal;
+/// a tone key typed after the `h` is handled by `apply_interjection_tone`.
+pub(crate) fn is_interjection_h(buf: &[char]) -> bool {
+    buf.len() == 2 && is_vowel(buf[0]) && matches!(buf[1], 'h' | 'H')
 }
 
 fn consonant_key(c: char) -> Option<char> {
@@ -79,6 +89,8 @@ fn valid_onset(onset: &[char]) -> bool {
         &['c'],
         &['c', 'h'],
         &['d'],
+        // Colloquial `dzô`, `dzậy`.
+        &['d', 'z'],
         &['g'],
         &['g', 'h'],
         &['h'],
@@ -100,6 +112,8 @@ fn valid_onset(onset: &[char]) -> bool {
         &['t', 'r'],
         &['v'],
         &['x'],
+        // Colloquial `zô`, `zậy`, `zui`.
+        &['z'],
     ];
     if onset.is_empty() {
         return true;

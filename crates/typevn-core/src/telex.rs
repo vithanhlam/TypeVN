@@ -1,7 +1,7 @@
 //! Telex transformations on an in-memory char buffer.
 
 use crate::english::is_tech_prefix;
-use crate::syllable::last_syllable_start;
+use crate::syllable::{is_interjection_h, last_syllable_start};
 use crate::vowel::{
     compose_vowel, from_dd, has_special_shape, is_d, is_dd, is_vowel, parse_vowel, to_dd,
     tone_from_telex, Shape, Tone,
@@ -19,6 +19,10 @@ pub fn apply_telex(buf: &mut Vec<char>, c: char, origin: &[char]) {
 
     if is_tech_prefix(buf, Some(c)) {
         buf.push(c);
+        return;
+    }
+
+    if tone_from_telex(c).is_some_and(|t| apply_interjection_tone(buf, t)) {
         return;
     }
 
@@ -175,6 +179,24 @@ pub(crate) fn merge_uhorn_o(buf: &mut Vec<char>, typed_o: char) -> bool {
     };
     buf.push(ch);
     true
+}
+
+/// `ahf` → `àh`: tone typed after the `h` of an unmarked interjection.
+pub(crate) fn apply_interjection_tone(buf: &mut [char], tone: Tone) -> bool {
+    if !is_interjection_h(buf) || !buf[0].is_ascii() {
+        return false;
+    }
+    let Some(mut v) = parse_vowel(buf[0]) else {
+        return false;
+    };
+    v.tone = tone;
+    match compose_vowel(v) {
+        Some(ch) => {
+            buf[0] = ch;
+            true
+        }
+        None => false,
+    }
 }
 
 pub(crate) fn apply_tone(buf: &mut [char], tone: Tone) -> bool {

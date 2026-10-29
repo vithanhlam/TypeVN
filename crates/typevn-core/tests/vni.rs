@@ -169,3 +169,14 @@ fn reset_clears_stuck_buffer_so_marks_work_again() {
         EngineAction::Preedit("á".into())
     );
 }
+
+#[test]
+fn vni_colloquial_words() {
+    assert_eq!(vni("dzo6"), "dzô");
+    assert_eq!(vni("dza65y"), "dzậy");
+    assert_eq!(vni("zo6"), "zô");
+    assert_eq!(vni("a2h"), "àh");
+    assert_eq!(vni("ah2"), "àh");
+    assert_eq!(vni("u82h"), "ừh");
+    assert_eq!(vni("ah"), "ah");
+}

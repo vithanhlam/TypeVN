@@ -184,6 +184,8 @@ const TECH: &[&str] = &[
     "write",
     "yaml",
     "yield",
+    "zero",
+    "zoom",
 ];
 
 fn ascii_lower_buf(chars: &[char], extra: Option<char>, out: &mut [u8]) -> usize {
